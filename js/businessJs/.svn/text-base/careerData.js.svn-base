@@ -1,0 +1,57 @@
+var careerData = [{
+	id:"1",
+	category:"IT",
+	text:"计算机/互联网/通信"
+},{
+	id:"2",
+	category:"制造",
+	text:"生产/公艺/制造"
+},{
+	id:"3",
+	category:"医疗",
+	text:"医疗/护理/制药"
+},{
+	id:"4",
+	category:"金融",
+	text:"金融/银行/投资/保险"
+},{
+	id:"5",
+	category:"商业",
+	text:"商业/服务/个体经营"
+},{
+	id:"6",
+	category:"文化",
+	text:"文化广告/传媒"
+},{
+	id:"7",
+	category:"艺术",
+	text:"娱乐/艺术/表演"
+},{
+	id:"8",
+	category:"法律",
+	text:"法律/法务"
+},{
+	id:"9",
+	category:"教育",
+	text:"教育/培训"
+},{
+	id:"10",
+	category:"行政",
+	text:"公务员/行政/事业单位"
+},{
+	id:"11",
+	category:"模特",
+	text:"模特"
+},{
+	id:"12",
+	category:"空姐",
+	text:"空姐"
+},{
+	id:"13",
+	category:"学生",
+	text:"学生"
+},{
+	id:"14",
+	category:"其它",
+	text:"其它"
+}]

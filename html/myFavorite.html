@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>我的收藏</title>
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<style type="text/css">
+			.checkDiv{
+				float: left;
+			    position: relative;
+    			left: -8px;
+    			top: 9px;
+			}
+			.mui-checkbox.mui-left input[type=checkbox], .mui-radio.mui-left input[type=radio]{
+				left: 0;
+				top: 0px;
+			}
+			.mui-checkbox.mui-left label, .mui-radio.mui-left label{
+				padding-right: 0px;
+				padding-left: 32px;
+			}
+			.delete{
+				display: flex;
+			    align-items: center;
+			    justify-content: flex-end;
+			    color: #007aff;
+			}
+			.title{
+			    font-size: 16px;
+    			color: black;
+			}	
+			.source{
+				font-size: 12px;
+				color: gray;
+			}
+			.answer{
+				font-size: 12px;
+				color: gray;
+			}
+			.noFavorite{
+			    height: 100%;
+			    width: 100%;
+			    position: absolute;
+			    top: 50px;
+			    text-align: center;
+			}
+			.pos_relation{
+				position:relative;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="favoriateBody">
+			<div class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 class="mui-title">我的收藏</h1>
+				<a class="mui-icon mui-icon-compose mui-pull-right edit" v-on:click="doEdit"></a>
+			</div>
+			<nav v-if="check" class='mui-bar mui-bar-footer delete'>  
+				<span class='delete'>删除<span class="deleteNum" v-on:click="deleteFavorites">({{checkedNum}})</span></span>  
+			</nav>
+			<div class="mui-content">
+				 <!-- <div class="mui-scroll"> -->
+					<div class="pos_relation" v-show="mainMessage">
+						<ul id="List" class="mui-table-view" v-if="hasFavorite">
+						    <li class="mui-table-view-cell" v-for='ele in messageList'v-bind:key="ele.articleId" v-bind:data-id="ele.articleId" v-on:click.stop="goDetail">
+								<a href="javascript:;">
+									<div class="mui-input-row mui-checkbox mui-left checkDiv" v-if="check">
+										<label></label>
+										<input name="checkbox" value="Item 1" type="checkbox" v-on:click.stop="goDetail">
+									</div>
+									<img class="mui-media-object mui-pull-left" v-if="!ele.image" src="../img/failPic.jpg">
+									<img class="mui-media-object mui-pull-left" v-else v-bind:src="ftpStaticURL+ele.image">
+									<div class="mui-media-body">
+										<p class="mui-ellipsis title">{{ele.name}}</p>
+										<span class="source">{{ele.category}}</span>
+										<span class="mui-pull-right answer">{{ele.createDate}}</span>
+									</div>
+								</a>
+						    </li>
+						</ul>
+						<div v-else class="noFavorite">亲，您暂无收藏</div>
+					</div>
+				 </div>
+			<!-- </div> -->
+		</div>
+		<script type="text/javascript" src="../js/vue.js" ></script>
+		<script type="text/javascript" src="../js/mui.js" ></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/staticVar.js" ></script>
+		<script type="text/javascript" src="../js/businessJs/myFavorite.js" ></script>
+		<script>
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+		 if(mui.os.wechat){
+				//wx环境需要判断是否绑定了手机号
+			 	app.isBindPhone();
+		}
+			var vm = new Vue({
+				el:"#favoriateBody",
+				data:{
+					check:false,
+					mainMessage:true,
+					ftpStaticURL:ftpStaticURL,
+					checkedNum:0,
+					messageList:[],
+					ids:[]
+				},
+				computed:{
+					hasFavorite:function(){
+						return  this.messageList.length > 0;
+					}
+				},
+				methods:{
+					//点击收藏列表  
+					goDetail:function(e){
+						var self = e.currentTarget;
+						if(vm.check){
+							var checkbox,articleID;
+							if(self.type === "checkbox"){
+								checkbox = self;
+								//TODO 依赖dom结构 
+								articleID = self.parentNode.parentNode.parentNode.getAttribute("data-id");
+							}else{
+								checkbox = mui("input[name='checkbox']",self)[0];
+								checkbox.checked = (checkbox.checked === true?false:true);
+								articleID = self.getAttribute("data-id");
+							}
+							if (checkbox.checked === true) {
+								vm.checkedNum+=1;
+								this.pushId(articleID);
+							}else{
+								vm.checkedNum-=1;
+								this.ShiftId(articleID);
+							}
+						}else{
+							var baseUrl="detail.html";
+							var id=e.currentTarget.getAttribute("data-id");//文章id
+							var name = document.querySelector(".title").innerHTML;//文章title
+							var url = mui.os.plus? baseUrl:baseUrl+'?articleId='+id+'&name='+name;  
+							mui.openWindow({
+								id:"detail",
+								url:url
+							});
+						}
+					},
+					//点击编辑按钮 
+					doEdit:function(e){
+						vm.check = vm.check?false:true;
+						//取消编辑时，checkedNum置为0,否则，下次编辑时会有上次选择的条目数量。
+						vm.checkedNum = 0;
+					},
+					//增加一个文章ID 
+					pushId:function(articleID){
+						this.ids.push(articleID);
+					},
+					//移除一个文章ID 
+					ShiftId:function(articleID){
+						this.ids.remove(articleID);
+					},
+					//删除单个或多个收藏      ids为收藏文章id以,隔开的字符串
+					deleteFavorites:function(){
+						deleteFavorites(this.ids);
+					}
+				}
+			});
+			mui.ready(function(){
+				getMyFavoriteList();
+			});
+			
+		</script>
+	</body>
+</html>

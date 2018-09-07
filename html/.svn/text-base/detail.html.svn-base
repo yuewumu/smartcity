@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<title>文章详情</title>
+<link rel="stylesheet" href="../css/mui.css" />
+<link rel="stylesheet" href="../css/iconfont.css" />
+<link rel="stylesheet" href="../css/common.css" />
+<link rel="stylesheet" href="../css/mui.previewImage.css" />
+<style>
+.mui-table-view:before{
+	height:0px;
+}
+.mui-table-view:after{
+	height:0px;
+}
+.mui-media-body{
+	position:relative;
+}
+.mui-media-body p{
+	min-height:20px;
+}
+.mui-table-view .mui-media-object.mui-pull-left{
+	height:35px;
+	width:35px;
+	border-radius: 100%;
+}
+.mui-table-view .mui-media-object{
+	min-width:20px;
+}
+.comment{
+	color:black;
+}
+.comment > input{
+	width:85%;
+	border: none;
+    margin-bottom: 0px;
+    margin-top: 5px;
+}
+.nickName{
+	font-size:17px;
+}
+.thumbUp{
+	position:absolute;
+	top:0px;
+	right:0px;
+}
+.commentArea{
+    background: #ffffff;
+}
+.recentCommentsTip{
+	position: relative;
+    text-align: center;
+    padding-top: 20px;
+    font-size: 16px;
+    letter-spacing: 1px
+}
+.recentCommentsTip:before{
+    position: absolute;
+    background-color: #ddd;
+    bottom: 9px;
+    left: 45px;
+    width: 80px;
+    height: 1px;
+    content: '';
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+.recentCommentsTip:after{
+    position: absolute;
+    background-color: #ddd;
+    bottom: 9px;
+    right:45px;
+    width: 80px;
+    height: 1px;
+    content: '';
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+article{
+	padding:0px 5px;
+	font-size:15px;
+	font-family: simsun, arial, helvetica, clean, sans-serif;
+}
+article img{
+	width:95%!important;
+	max-height:215px;
+}
+article p{
+	color: rgb(43, 43, 43);
+	font-size:15px!important;
+	line-height: 2em;
+}
+.articleFeeBack{
+	display:flex;
+    height: 60px;
+    line-height: 60px;
+}
+.articleFeeBack p:first-child{
+    padding-left: 5px;
+    width:70px;
+}
+.articleFeeBack p:last-child{
+	flex:1;
+    padding-right: 10px;
+    text-align:right;
+}
+.thumbUp span{
+	fong-size:15px;
+}
+.commentWorkable{
+    background: #0095f7;
+    padding: 5px 5px;
+    border-radius: 3px;
+}
+.commentDisable{
+    background: #cccccc;
+    color: #FFFFFF;
+    padding: 5px 5px;
+    border-radius: 3PX;
+}
+.openCommentList{
+	text-align:center;
+}
+.openCommentList button{
+    background: #efeff4;
+    border-radius: 20px;
+    border: none;
+}
+.stared{
+    color: #0095f7;
+}
+.title{
+	font-size: 17px;
+    font-weight: 700;
+    padding: 10px 5px;
+}
+.articleInfo{
+    padding: 0px 5px;
+    padding-bottom: 10px;
+    color: #8f8f94;
+}
+.noComments{
+	margin:0 auto;
+	text-align:center;
+}
+.noComments img{
+	width:150px;
+}
+.noComments span{
+    display: block;
+    padding-bottom: 30px;
+}
+.commentArea ul{
+	margin-bottom:20px;
+}
+</style>
+</head>
+<body>
+
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">详情</h1>
+	<div id="starAndShare" class="title-sure mui-pull-right">
+		<span class="mui-icon iconfont icon-yishoucang stared" v-if="isStar" v-on:click="cancelStar"></span>
+		<span class="mui-icon iconfont icon-shoucang" v-else v-on:click="starArticle"></span>
+		<span class="mui-icon iconfont icon-fenxiang"></span>
+	</div>
+</header>
+<nav class='mui-bar mui-bar-tab'>  
+	<div id="comment" class="comment">
+		<input id="commentContent" name="" type="text" value="" placeholder="写点什么" v-model="userInput">
+		<span class="commentWorkable" v-if="switchText" v-on:click="commentOn">发表</span>
+		<span class="commentDisable" v-else>发表</span>
+	</div>
+</nav>
+<div class="mui-content mui-scroll-wrapper">
+	<div class="mui-scroll">
+		<div id="detailContent">
+			<div class="titleArea">
+				<div class="title">{{articleTitle}}</div>
+				<div class="articleInfo">
+					<span>{{articleCategory}}</span>
+					<span>{{articleCreateDate}}</span>
+				</div>
+			</div>
+			<article id="article" v-html="articleContent"></article>
+			<section class="articleFeeBack">
+				<p>
+					<span>阅读</span>
+					<span>{{articleReadNum}}</span>
+				</p>
+				<!-- <p>
+					<span class="mui-icon iconfont icon-dianzan" v-on:click="articleThumUp"></span>
+					<span>{{articleThumbUp}}</span>
+				</p> -->
+				<p class="mui-pull-right complain"></p>
+			</section>
+			<div class="commentArea">
+				<p class="recentCommentsTip">最新评论</p>
+				<ul id="recentComments" class="mui-table-view">
+					<template v-if="hasComments">
+						<li class="mui-table-view-cell mui-media" v-on:click="openCommentList"  v-for='ele in comments'>
+							<a href="javascript:;">
+								<img class="mui-media-object mui-pull-left" v-if="!ele.memberPicturePath" src="../img/visitor.png">
+								<img class="mui-media-object mui-pull-left" v-else v-bind:src="ftpStaticURL+ele.memberPicturePath+ele.memberPictureName">
+								<div class="mui-media-body">
+									<p class="nickName">{{ele.memberNickName}}</p>
+									<p class="comment">{{ele.content}}</p>
+									<span>{{ele.createDate}}</span>
+									<div class="thumbUp">
+										<!-- <span class="mui-icon iconfont icon-dianzan"></span>
+										<span></span> -->
+									</div>
+								</div>
+							</a>
+						</li>
+						<li class="mui-table-view-cell openCommentList" v-on:click="openCommentList">
+							<button>评论列表</button>
+						</li>
+					</template>
+					<template v-else>
+						<div class="noComments">
+							<img src="../img/noComment.png"/>
+							<span>暂无评论，速抢沙发</span>
+						</div>
+					</template>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="../js/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="../js/mui.js" ></script>
+<script type="text/javascript" src="../js/vue.js" ></script>
+<script type="text/javascript" src="../js/mui.zoom.js"></script>
+<script type="text/javascript" src="../js/mui.previewimage.js"></script>
+<script type="text/javascript" src="../js/common.js" ></script>
+<script type="text/javascript" src="../js/staticVar.js"></script>
+<script type="text/javascript" src="../js/businessJs/detail.js"></script>
+<script type="text/javascript">
+
+
+if(!app.isLoginFlag()){
+	 if(mui.os.plus){
+		 mui.plusReady(function(){
+			mui.openWindow({
+				id:"login",
+				url:'login.html'
+			});
+		 });
+	 }else{
+		 mui.ready(function(){
+		 	mui.openWindow({
+				id:"login",
+				url:'login.html'
+			});
+		 });
+	 }
+}
+	//初始化滚动条
+	mui('.mui-scroll-wrapper').scroll({
+		deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+	});
+	var detailContentVM = new Vue({
+		el:"#detailContent",
+		data:{
+			articleReadNum:0,
+			articleThumbUp:0,
+			articleTitle:"",
+			articleContent:"",
+			articleCreateDate:'',
+			articleCategory:'',
+			articleCategoryId:"",
+			articleImage:'',
+			commentsTotal:12,
+			comments:[],
+			allowComment:"",
+			ftpStaticURL:ftpStaticURL,
+		},
+		computed:{
+			hasComments:function(){
+				return this.comments.length > 0;
+			}
+		},
+		methods:{
+			//打开评论列表 
+			openCommentList:function(event){
+				var baseUrl = 'CommentList.html';
+				var url = mui.os.plus? baseUrl:baseUrl+'?articleId='+getUrlParam("articleId")+'&categoryId='+detailContentVM.articleCategoryId;  
+				mui.openWindow({
+				    id:'CommentList',
+				    url:url,
+			  	});
+			},
+			//文章点赞 
+			articleThumUp:function(event){
+				 this.articleThumbUp+=1;
+			},
+			testCanjudeg:function(){
+				if(allowComment===0){
+					 $(".comment").css("display", "none");
+				} 
+			}
+		}
+	});
+	
+	var commentVM = new Vue({
+		el:"#comment",
+		data:{
+			userInput:""
+		},
+		computed:{
+			switchText:function(){
+				return this.userInput.trim().length > 0?true:false;
+			}
+		},
+		methods:{
+			//发表评论 
+			commentOn:function(event){
+// 				console.log(this.userInput);
+				//获取发表评论，请求参数
+				addArticleComment();
+			}
+		}
+	});
+	var starAndSharVM = new Vue({
+		el:"#starAndShare",
+		data:{
+			isStar:false
+		},
+		methods:{
+			//收藏 
+			starArticle:function(){
+				//收藏文章
+				collectArticle();
+			},
+			//取消收藏 
+			cancelStar:function(){
+				this.isStar = false;
+				cancelArticle();
+			}
+		}
+	});
+	//detailContentVM.testCanjudeg();
+</script>
+</body>
+</html>

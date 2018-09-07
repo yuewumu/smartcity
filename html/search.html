@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+	<head> 
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>搜索</title>
+		<link rel="stylesheet" href="../css/mui.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<style>
+			.searchHead{
+				display: flex;
+			    align-items: center;
+				background: #0095f7;
+			}
+			.mui-search{
+				flex:6;
+			}
+			.mui-btn{
+				margin: 6px;
+			}
+			.cancel{
+				flex: 1;
+				text-align: right;
+			}
+			.searchHistory .name{
+				padding-left: 20px;
+			}
+			.name{
+				height: 40px;
+				line-height: 40px;
+			}
+			.searched .name{
+				padding-left:20px;
+			}
+			.mui-table-view-cell{
+				padding-left: 20px;
+			}
+			.recentHot{
+			    padding-left: 20px;
+			}
+			input[type='search']::after{
+				content: url(../img/icons/search.png);
+			}
+			.historyNone{
+				margin-bottom:50px;
+			}
+			.classifySearch{
+				display:flex;
+				align-items:center;
+				justify-content:center;
+			    margin-top: 25px;
+			}
+			.classifySearch > div{
+				display:flex;
+				flex:1;
+				flex-direction:column;
+				align-items:center;
+				justify-content:center;
+			}
+			.classifySearch > div > img{
+				margin-bottom:10px;
+			} 
+			.searchTip{
+			    text-align: center;
+			    font-size: 20px;
+			    font-weight: 700;
+		        height: 50px;
+    			line-height: 50px;
+		        position: relative;
+			}
+			.searchTip:after{
+			    position: absolute;
+			    right: 0;
+			    bottom: 0;
+		        left: 50px;
+    			right: 50px;
+			    height: 1px;
+			    content: '';
+			    -webkit-transform: scaleY(.5);
+			    transform: scaleY(.5);
+			    background-color: #c8c7cc;
+			}
+			.hisClear{
+			    position: absolute;
+			    margin-top: -22px;
+			    right: 15px;
+			}
+			.hisClearAll{
+				color: #007aff;
+			    height: 40px;
+			    line-height: 40px;
+			    text-align: center;
+			}
+		</style>
+		<script type="text/javascript" src="../js/mui.js" ></script>
+		<script type="text/javascript" src="../js/vue.js" ></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/businessJs/search.js" ></script>
+		<script type="text/javascript" src="../js/staticVar.js" ></script>
+	</head>
+	<body>
+		<div id="searchList">
+			<div class="mui-bar mui-bar-nav searchHead">
+				<div class="mui-input-row mui-search" id="searchForm">
+				    <input type="search" id="searchInput" onkeyup="enterSearch(event)" class="mui-input-clear" placeholder="请输入关键字">
+				</div>
+				<div class="cancel">取消</div>
+			</div>
+			<div class="mui-content">
+				<div class="noSearched" v-if="!searched">
+					<div class="searchHistory" v-if="hasSearchHistory">
+						<div class="name">历史搜索</div>
+						<ul class="mui-table-view" v-for="(ele,index) in searchHistory">
+						    <li class="mui-table-view-cell">
+						    	<a class="hisDetail" v-on:click="goToSearch">{{ele}}</a>
+						    	<span class="mui-icon mui-icon-closeempty hisClear" v-bind:data-index = "index"></span>
+						    </li>
+						</ul>
+						<div class="hisClearAll">清除历史记录</div>
+					</div>
+					<div class="historyNone" v-if="!hasSearchHistory">
+						<div class="searchTip">搜索您感兴趣的内容</div>
+						<div class="classifySearch">
+							<div>
+								<img alt="" src="../img/icons/information.png">
+								<span>资讯</span>
+							</div>
+							<div>
+								<img alt="" src="../img/icons/pictures.png">
+								<span>图集</span>
+							</div>
+							<div>
+								<img alt="" src="../img/icons/video.png">
+								<span>视频</span>
+							</div>
+						</div>
+					</div>
+					<div class="recentHot">
+						<div class="name">近期热门</div>
+						<button type="button" class="mui-btn">步行街</button>
+						<button type="button" class="mui-btn">交通</button>
+						<button type="button" class="mui-btn">双十一狂欢</button>
+						<button type="button" class="mui-btn">跑步</button>
+						<button type="button" class="mui-btn">交友</button>
+						<button type="button" class="mui-btn">javascript</button>
+					</div>
+				</div>
+				<div class="searched" v-if="searched">
+					<div class="name">搜索结果</div>
+					<!--数据列表-->
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell mui-media"  v-for='ele in searchedList'>
+							<a href="javascript:;" v-on:click="goDetail" v-bind:data-id="ele.id">
+								<img class="mui-media-object mui-pull-left" v-if="!ele.image" src="../img/failPic.jpg">
+								<img class="mui-media-object mui-pull-left" v-else v-bind:src="ftpStaticURL+ele.image">
+								<div class="mui-media-body">
+									<p class="title">{{ele.title}}</p>
+									<span>{{ele.category.name}}</span>
+									<span class="mui-pull-right">{{ele.createDate}}</span>
+								</div>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<script>
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+			
+		
+			var vm = new Vue({
+				el:"#searchList",
+				data:{
+					searched:false,
+					ftpStaticURL:ftpStaticURL,
+					searchHistory:search.getSearchItem(),
+					hasSearchHistory:(search.getSearchItem()!== null?(search.getSearchItem().length > 0?true:false):false),
+					searchedList:[{
+						title:"爱更好",
+						category:{
+							name:"阿斯利康的技法的"
+						},
+						createDate:"2017-02-23"
+					},{
+						title:"爱更好",
+						category:{
+							name:"阿斯利康的技法的"
+						},
+						createDate:"2017-02-23"
+					},{
+						title:"爱更好",
+						category:{
+							name:"阿斯利康的技法的"
+						},
+						createDate:"2017-02-23"
+					},{
+						title:"爱更好",
+						category:{
+							name:"阿斯利康的技法的"
+						},
+						createDate:"2017-02-23"
+					},{
+						title:"爱更好",
+						category:{
+							name:"阿斯利康的技法的"
+						},
+						createDate:"2017-02-23"
+					}]
+				},
+				methods:{
+					goToSearch:function(e){
+						var self = e.currentTarget;
+						searchDom[0].focus();
+						searchDom[0].value=self.text;
+						beginSearch();
+					},
+					goDetail:function(e){
+						var self = e.currentTarget;
+						var baseUrl="detail.html";
+						var id=self.getAttribute("data-id")//文章id
+						var url = mui.os.plus? baseUrl:baseUrl+'?articleId=' + id;  
+						mui.openWindow({
+							id:"detail",
+							url:url,
+							extras:{
+								articleId:id
+							}
+						});
+					}
+				}
+			});
+			//发起搜索
+			var searchDom = mui("input[type='search']");
+			function enterSearch(e) {
+			    if(e.keyCode == 13) {
+			    	beginSearch();
+			    }
+			}
+			function  beginSearch(){
+				var keyWords=searchDom[0].value.trim();
+		    	if(keyWords.length==0) return false;
+		    	vm.searched = true;
+		    	search.addSearchItem(keyWords);
+		    	getSearchResult(keyWords);
+			}
+			//点击取消按钮
+			var cancel = document.querySelector(".cancel");
+			cancel.addEventListener("tap",function(e){
+				mui.back();
+			});
+			//点击删除一条历史记录
+			var hisClear = mui(".hisClear");
+			if(hisClear){
+				hisClear.each(function(i,e){
+					e.addEventListener("tap",function(e){
+						var self = e.currentTarget;
+						var inedx = parseInt(self.getAttribute("data-index"));
+						search.deleteSearchItem(inedx);
+						vm.hasSearchHistory = search.getSearchItem()!== null?(search.getSearchItem().length > 0?true:false):false;
+						vm.searchHistory = search.getSearchItem();
+					});
+				});
+			}
+			//点击删除所有历史记录
+			var hisClearAll = mui(".hisClearAll"); 
+			if(hisClearAll){
+				hisClearAll.each(function(i,e){
+					e.addEventListener("tap",function(e){
+						search.deleteAllSearchItem();
+						vm.hasSearchHistory = search.getSearchItem()!== null?(search.getSearchItem().length > 0?true:false):false;
+						vm.searchHistory = search.getSearchItem();
+					});
+				});
+			}
+		</script>
+	</body> 
+</html>

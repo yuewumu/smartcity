@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<title>垃圾桶寻路</title>
+<link rel="stylesheet" href="../css/mui.min.css"/>
+<link rel="stylesheet" href="../fonts/mui.ttf" />
+<link rel="stylesheet" href="../css/findingTrash.css" />
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=G4rDnMBvmKlYv2KrBYrNnVw8"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
+<script type="text/javascript" src="../js/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="../js/staticVar.js"></script>
+<script type="text/javascript" src="../js/vue.js"></script>
+<script type="text/javascript" src="../js/mui.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/businessJs/findingTrash.js"></script>
+</head>
+<body>
+	<div id="choiceBody">
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-arrowthinleft mui-pull-left" style="font-size: 2rem;"></a>
+		    <h1 class="mui-title">{{title}}</h1>
+		</header>
+		<div class="mui-content">
+			<div class="choice_box" v-show="choiceBox">
+				<ul class="mui-table-view">
+				    <li class="mui-table-view-cell">{{currentProject}}<span class="mui-table-view-before"></span></li>
+				</ul>
+				<ul class="mui-table-view mui-table-view-content">
+				    <li class="mui-table-view-cell" :data-id="item.id"  @click="choiceBoxTitle" v-for="item in itemList">{{item.name}}</li>
+				</ul>
+			</div>
+			<div class="choice_content" v-show="choiceContent">
+				<ul class="mui-table-view">
+				    <li class="mui-table-view-cell" @click="showChoiceBox">
+				    	<span class="currentProject">{{currentProject}}</span>
+					    <span class="mui-table-view-before"></span>
+					    <img class="mui-pull-right" src="../img/pitch_on.jpg">
+				    </li>
+				</ul>
+				<div id="segmentedControl" class="switchStatus">
+					<a class="all-item" :class="{statusActive:isAll}" @click="queryAll">
+						全部
+					</a>
+					<a class="full-item" :class="{statusActive:isFull}" @click="queryFull">
+						溢满
+					</a>
+					<a class="empty-item" :class="{statusActive:isEmpty}" @click="queryEmpty">
+						空闲
+					</a>
+				</div>
+				<div class="mui-content-padded">
+					<div id="item1mobile" class="mui-control-content mui-active">
+						<ul class="mui-table-view">
+							<li class="mui-table-cell">
+								<div class="choice_having">
+									<ul class="mui-table-view mui-table-view-position" v-show="rubbishcontents.length>0">
+									    <li class="mui-table-view-cell">选择所有
+									    	<label class="checkbox_box mui-pull-right">
+									    		<div class="check">
+													<span><input type="checkbox" checked class="input_check input_checkWhole"><label for="input_check"></label></span>
+												</div>
+									    	</label>
+									    </li>
+									</ul>
+								</div>
+								<div class="pullDown_Box">
+								<div class="panel_content">
+									<div class="panel_content_left" v-if="rubbishcontents.length>0">
+										 <ul class="mui-table-view" v-for="rubbishcontent in rubbishcontents">  
+									        <li class="mui-table-view-cell mui-collapse">
+									            <a class="mui-navigate-right streetOrDevice" style="z-index: 999;display: block;" href="#">
+										            {{rubbishcontent.name}}
+										            <span class="mui-pull-right deploy" v-if="rubbishcontent.children.length">展开</span>
+									            </a>
+									            <div class="mui-collapse-content" v-for="rubbish in rubbishcontent.children">
+									                <p class="rubbish_content">
+									                	<span class="rubbish_color"></span>
+									                	<label class="rubbish_title">{{rubbish.name}}</label>
+									                </p>
+									                <div class="check_titel check">
+														<span>
+															<input type="checkbox" checked class="input_check" :data-lng="rubbish.longitude" :data-lat="rubbish.latitude">
+															<label for="check2"></label>
+														</span>
+													</div>
+									            </div>
+									        </li>
+									        <div class="panel_content_right" @click="checkStreet">
+										    	<div class="check panel_content_rightinput">
+													<span>
+														<input type="checkbox" checked  class="input_check" :data-lng="rubbishcontent.longitude" :data-lat="rubbishcontent.latitude" >
+														<label for="check1"></label>
+													</span>
+												</div>
+										    </div>
+									    </ul>
+								    </div>
+								    <div class="noDevice" v-else>
+								    	<div>没有相关设备</div>
+								    </div>
+							    </div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<footer @click="planningRoute">规划路线</footer>
+			</div>
+		</div>
+		<!--选择位置-->
+		<div class="startPosition" v-show="startPosition">
+			<div class="startContent">
+				<a class=" mui-icon mui-icon mui-icon-back mui-pull-left" style="font-size: 2rem;padding: .6rem;color: #9d9d9d;" v-on:click="returnBtn"></a>
+				<input type="text" class="startPlaceValue" placeholder="起点位置" @click="startBtn" value="" />
+			</div>
+			<div class="startDestination">
+				<input type="text" class="endPlaceValue" placeholder="终点位置" @click="startDestinationBtn" value=""/>
+			</div>
+			<div class="mapDot" v-show="MaoDotContent" @click="MapreconBtn">
+				<div class="mapDot_left mui-pull-left">
+					<img src="../img/Maptubiao.png"/>
+				</div>
+				<div class="mapDot_right mui-pull-left">
+					<span>地图选点
+				</div>
+			</div>
+		</div>
+		<!--地图选点-->
+		<div class="Mapreconnaissance" v-show="Mapreconnaissance">
+			<div id="MapMyreconnaissance"></div>
+			<div class="MapreconnaissanceHdr">
+				<a @click="MapbackBtn"><i class="mui-icon mui-icon-arrowleft"></i></a>
+			</div>
+			<div class="Mapreconnaissancefooter">
+				<div class="Mapreconnaissancefooter_left">
+					<p class="">{{choiceStartOrEnd==="start"?choiceStartAddr:choiceEndAddr}}</p>
+				</div>
+				<div class="Mapreconnaissancefooter_right mui-pull-right">
+					<button @click="surePlace">确定</button>
+				</div>
+			</div>
+			<div id="float" class="float"><img src="../img/icons/choicePointIcon.png"></div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript"> 
+var vm=new Vue({
+	el:'#choiceBody',
+	data:{
+		title:'选择项目', 
+		choiceBox:false, //显示项目列表 
+		choiceContent:true,//显示设备选择 
+		startPosition:false,//显示选择起点终点
+		MaoDotContent:false, //显示 地图选点文字 
+		Mapreconnaissance:false, //显示 地图选点地图 
+		currentProject:'九钰智慧科技', 
+		currentProjectId:"",
+		itemList:[],
+		rubbishcontents:[],
+		isAll:true,//选中全部 
+		isFull:false,//选中满溢
+		isEmpty:false,//选中空闲 
+		checkedRubishArray:[],//选中的垃圾桶经纬度数组 
+		choiceStartAddr:"",//选择的起始地址 
+		choiceStartAddrPoint:"106.56743,29.579792",//选择的起始地址point 
+		choiceEndAddr:"",//选择的终点地址  
+		choiceEndAddrPoint:"106.53063501,29.54460611",//选择的终点地址point  
+		choiceStartOrEnd:"start"
+	},
+	methods:{
+		choiceBoxTitle:function(e){
+			var projectId = e.currentTarget.getAttribute("data-id");
+			_projectName = e.currentTarget.innerHTML;
+			this.currentProjectId = projectId;
+			this.currentProject = e.currentTarget.innerHTML;
+			getTrashListByProjectId(projectId,"");
+		},
+		checkStreet:function(e){
+			var self = e.currentTarget;
+			var brotherLi = $(self).prev();
+			var isCheck = $(".input_check",self).prop("checked");
+			if(isCheck==true){
+				$(".input_check",brotherLi).each(function(i,e){
+					$(e).prop("checked",true);
+				});
+			}else{
+				$(".input_check",brotherLi).each(function(i,e){
+					$(e).prop("checked",false);
+				});
+			}
+		},
+		//地图页面返回地点选择页面 
+		MapbackBtn:function(){
+			this.showChoiceContent();
+		},
+		startDestinationBtn:function(){
+			this.choiceStartOrEnd = "end";
+			this.MaoDotContent=true;
+		},
+		startBtn:function(){
+			this.choiceStartOrEnd = "start";
+			this.MaoDotContent=true;
+		},
+		MapreconBtn:function(){
+			this.MaoDotContent=false;
+			this.Mapreconnaissance=true;
+			initMap();
+			var curPoint = document.getElementById("float");
+			curPoint.style.display = "block";
+		},
+		returnBtn:function(){
+			this.choiceBox=false;
+			this.choiceContent=true;
+			this.startPosition=false;
+		},
+		containerBtn:function(){
+			this.choiceBox=true;
+			this.containerBox=false;
+			this.containerHder=false;
+		},
+		//确定选择的地理位置 
+		surePlace:function(e){
+			var self = e.currentTarget;
+			if(this.choiceStartOrEnd === "start"){
+				var startPlace = document.querySelector(".startPlaceValue");
+				startPlace.value = this.choiceStartAddr;
+				this.MapbackBtn();
+			}else{
+				var endPlace = document.querySelector(".endPlaceValue");
+				var curPoint = document.getElementById("float");
+				curPoint.style.display = "none";
+				endPlace.value = this.choiceEndAddr;
+// 				this.MapbackBtn();
+				doSearchRoad(this.checkedRubishArray,this.choiceStartAddrPoint,this.choiceEndAddrPoint);
+// 				var rubishArray = new Array("106.57486,29.583164", "106.574824,29.581091");
+// 				doSearchRoad(rubishArray);
+			}
+		},
+		//规划路线 
+		planningRoute:function(e){
+			this.checkedRubishArray = [];
+			var input_checks = document.querySelectorAll(".input_check:checked");
+			input_checks.forEach(function(e,i){
+				var latitude = e.getAttribute("data-lat");
+				var longitude = e.getAttribute("data-lng");
+				if(latitude && longitude){
+					var pointStr =longitude+","+latitude;
+					this.checkedRubishArray.push(pointStr);
+				}
+			},this);
+			//隐藏悬浮在地图中心的点 
+			var curPoint = document.getElementById("float");
+				curPoint.style.display = "none";
+			initMap();
+			this.showMap();
+			doSearchRoad(this.checkedRubishArray,this.choiceStartAddrPoint,this.choiceEndAddrPoint);
+		},
+		//显示垃圾桶设备列表  
+		showChoiceContent:function(){
+			//点击状态按钮显示相关
+			if(this.choiceContent){
+				if(this.rubbishcontents.length>0){
+					return ;
+				}else{
+					mui.toast("没有相关状态的数据"); 
+				}
+			//点击项目显示相关  
+			}else{
+				if(this.rubbishcontents.length>0){
+					this.choiceBox = false;
+					this.choiceContent = true;
+					this.startPosition = false;
+					this.MaoDotContent = false; 
+					this.Mapreconnaissance = false;
+					//显示全部状态  
+					this.isAll = true;
+					this.isFull = false;
+					this.isEmpty = false;
+				}else{
+					mui.toast("此项目下没有垃圾桶设备"); 
+					return;
+				}
+			}
+		},
+		//显示项目列表 
+		showChoiceBox:function(e){
+			this.choiceBox = true;
+			this.choiceContent = false;
+			this.startPosition = false;
+			this.MaoDotContent = false; 
+			this.Mapreconnaissance = false;
+		},
+		//显示地图页面 
+		showMap:function(){
+			this.choiceBox = false;
+			this.choiceContent = false;
+			this.startPosition = false;
+			this.MaoDotContent = false; 
+			this.Mapreconnaissance = true;
+		},
+		//点击全部按钮 查询全部的设备 
+		queryAll:function(e){
+			var self = e.currentTarget;
+			this.isAll = true;
+			this.isFull = false;
+			this.isEmpty = false;
+			getTrashListByProjectId(this.currentProjectId,"");
+		},
+		//点击满溢按钮 查询满溢状态的设备 
+		queryFull:function(e){
+			this.isAll = false;
+			this.isFull = true;
+			this.isEmpty = false;
+			getTrashListByProjectId(this.currentProjectId,"full");
+		},
+		//点击空闲按钮 查询空闲状态的设备 
+		queryEmpty:function(){
+			this.isAll = false;
+			this.isFull = false;
+			this.isEmpty = true;
+			getTrashListByProjectId(this.currentProjectId,"empty");
+		}
+	}
+})
+//重写返回逻辑
+var _back = mui.back;
+mui.back = function(){
+	if (vm.choiceBox) {
+		_back();
+	}else if(vm.choiceContent){
+		showTypelist();
+	}
+}
+function showTypelist(){
+	vm.choiceBox = true;
+	vm.choiceContent = false;
+}
+//选择checked实现功能
+$(".input_checkWhole").on('click',function(){
+	if(this.checked==true){
+		//prop()获取匹配元素的属性值
+		$("input").prop('checked',true);
+	}else{
+		var checkeboxs = $("input");
+		checkeboxs.each(function(i,e){
+			
+		});
+		$("input").prop("checked",false);
+	}
+});
+</script> 
+</html>

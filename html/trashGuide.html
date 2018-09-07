@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+<title>垃圾桶向导</title>
+<style type="text/css">
+label{border: 1px solid #e2e2e2 !important;padding: 2px 5px  !important;color: #a6a6a6;border-radius: 5px;color: a6a6a6;}
+body, html, #allmap {width: 100%;height: 100%;overflow: hidden;margin: 0;font-family: "微软雅黑";}
+.trash_box{position: fixed;width: 100%;height: 100%;top: 0;right: 0;bottom: 0;left: 0;}
+.trash_content{width: 100%;height: 100%;}
+.trash_Return{width: 2.5rem;height: 2.5rem;position: absolute;top: 10px;left: 10px;z-index: 999;}
+.trash_Return a{display: block;background: #001b2b;width: 100%;height: 100%;border-radius: 50%;text-align: center;line-height: 2.5rem;color: #fff;opacity: .25;}
+.trashNavigation{width: 2.5rem;height: 2.5rem;position: absolute;right: 20px;bottom: 20px;}
+.trashNavigation a{display: block;background: #26a5f2;width: 100%;height: 100%;border-radius: 50%;text-align: center;line-height: 2.5rem;color: #fff;font-size: 2rem;}
+.trashGif{width:100%;margin:auto;position:relative;z-index:999;}
+.trashGif img{width:100%;max-width:500px;}
+</style>
+<link rel="stylesheet" href="../css/mui.min.css" />
+<link rel="stylesheet" href="../iconfont/iconfont.css" />
+<script type="text/javascript"src="http://api.map.baidu.com/api?v=2.0&ak=G4rDnMBvmKlYv2KrBYrNnVw8"></script>
+<script type="text/javascript"src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
+<script src="../js/mui.min.js"></script>
+<script src="../js/common.js"></script>
+<script type="text/javascript" src="../js/jquery-2.2.0.min.js" ></script>
+<script type="text/javascript" src="../js/vue.js" ></script>
+<script type="text/javascript" src="../js/staticVar.js"></script>
+<script type="text/javascript" src="../js/businessJs/trashGuide.js"></script>
+</head>
+<body>
+<div id="TrashVue">
+	<div class="trashGif" v-show="trashGif">
+		<img src="../img/pariking.gif">
+	</div>
+	<div class="trash_box">
+		<div class="trash_content" id="allmap"></div>
+		<div class="trash_Return">
+			<a class="mui-action-back mui-icon mui-icon-left-nav"></a>
+		</div>
+		<div class="trashNavigation" v-show="trashNavigation">
+			<a class="iconfont icon-luxian"  onclick="beginNavigation()"></a>
+		</div>
+	</div>
+	<div>
+		<!-- <input type="button" id="btn" onclick="getTrashInfo()" value="Dian" /> -->
+		<!-- <input type="hidden" id="begin" value="开始导航" /> -->
+		<!-- <input type="hidden" id="end" onclick="endNavigatrion()" value="退出导航" /> -->
+	</div>
+</div>
+</body>
+<script>
+var vm=new Vue({
+	el:"#TrashVue",
+	data:{
+		trashNavigation:false,//导航按钮
+		trashGif:false,//没有地图的时候
+	}
+});
+//页面返回逻辑
+var _back = mui.back;
+mui.back = function(){
+	if (vm.trashNavigation) {
+		endNavigatrion();
+		vm.trashNavigation = false;
+	}else{
+		_back();
+	}
+} 
+$(document).ready(function(){
+	$(window).resize(function(){ 
+	    $(".trashGif").css({ 
+	        position: "absolute", 
+	        left: ($(window).width() - $(".trashGif").outerWidth())/2, 
+	        top: ($(window).height() - $(".trashGif").outerHeight())/2 
+	    });
+	}); 
+	$(window).resize();
+});
+</script>
+<script type="text/javascript">
+	var lat; //中心点的纬度	
+	var lng; //中心点的经度
+	var map = new BMap.Map("allmap"); // 创建Map实例
+	var point;//创建点的实例
+	var currentLongitude = ""; //当前的经度
+	var currentLatitude = ""; //当前的纬度
+	var trashPoints = new Array(); //新建的垃圾桶点的数组, 用于显示最佳的缩放大小
+	var endlat; //终点纬度, 一般情况指所选垃圾桶的纬度
+	var endlng; //终点经度, 一般情况指所选垃圾桶的经度
+	//页面加载时启动
+	window.onload = function() {
+		getLocationAddress();//获取当前点并标记为中心
+	}
+	//获取当前设备的经度和纬度
+	function getLocationAddress() {
+		var geolocation = new BMap.Geolocation();
+		geolocation.getCurrentPosition(function(r) {
+			var result = this.getStatus();
+			if (result == BMAP_STATUS_SUCCESS) {
+				//获取经纬度
+				currentLongitude = r.point.lng;
+				currentLatitude = r.point.lat;
+				//设置中心点的方法
+				setCenterAndZoom(currentLongitude, currentLatitude);
+				//获取项目列表的方法
+				getSysProjectList(currentLongitude, currentLatitude);
+			} else {
+				var promptStr = "";
+				switch (result) {
+				case BMAP_STATUS_UNKNOWN_LOCATION:
+					promptStr = "定位位置,结果未知";
+					break;
+				case BMAP_STATUS_SERVICE_UNAVAILABLE:
+					promptStr = "定位服务不可用";
+					break;
+				case BMAP_STATUS_TIMEOUT:
+					promptStr = "定位超时";
+					break;
+				default:
+					promptStr = "定位失败";
+					break;
+				}
+			}
+		}, {
+			enableHighAccuracy : true,
+			timeout : 5000
+		});
+
+	}
+
+	//设置中心点和当前位置的方法
+	function setCenterAndZoom(currentLongitude, currentLatitude) {
+		// 百度地图API功能
+		map.enableDoubleClickZoom();//启用双击方法
+		map.enableContinuousZoom(); //启动拖拽
+		map.enableScrollWheelZoom(); //启用鼠标缩放
+		point = new BMap.Point(currentLongitude, currentLatitude);//设置中心点坐标
+		var marker = new BMap.Marker(point);
+		var circle = new BMap.Circle(point, 1000, {
+			strokeColor : "red",
+			strokeWeight : 2,
+			strokeOpacity : 0.4
+		}); //创建圆 */
+		map.addOverlay(marker); //画点
+		var label = new BMap.Label("当前位置", {
+			offset : new BMap.Size(20, -10)
+		});
+		marker.setLabel(label);
+		map.centerAndZoom(point, 15); // 初始化地图,设置中心点坐标和地图级
+		/*   getClickPoint();//调用获取鼠标点击位置为中心点 */
+	}
+	
+	/**
+	 * 此方法为获得坐标数组 并生成若干个点 
+	 * @param markerArr 查询的垃圾桶数组 
+	 * @param selectWhat 查询的垃圾桶状态
+	 * @returns
+	 */
+	function map_init(markerArr,selectWhat) {
+		var point = new Array(); //存放标注点经纬信息的数组    
+		var marker = new Array(); //存放标注点对象的数组    
+		/* var info = new Array(); *///存放提示信息窗口对象的数组    
+		//设置图标(此处为垃圾桶装满的图标)
+		var fullIcon = new BMap.Icon("../img/icons/full.png", new BMap.Size(
+				60, 90), {
+			imageOffset : new BMap.Size(0, 0)
+		});
+		//设置图标(此处为垃圾桶空闲的图标)
+		var emptyIcon = new BMap.Icon("../img/icons/empty.png", new BMap.Size(
+				60, 90), {
+			imageOffset : new BMap.Size(0, 0)
+		});
+		//循环生成垃圾桶的位置
+		for (var i = 0; i < markerArr.length; i++) {
+			var p0 = markerArr[i].point.split(",")[0]; //    
+			var p1 = markerArr[i].point.split(",")[1]; //按照原数组的point格式将地图点坐标的经纬度分别提出来    
+			point[i] = new BMap.Point(p0, p1); //循环生成新的地图点    
+			//存入全局变量trashPoints数组中
+			trashPoints.push(point[i]);
+			//判断垃圾桶状态来显示对应垃圾桶的图标 
+			if(selectWhat === "full"){
+				marker[i] = new BMap.Marker(point[i], {
+					icon :fullIcon
+				}); //按照地图点坐标生成标记  
+			} else{
+				marker[i] = new BMap.Marker(point[i], {
+					icon :emptyIcon
+				}); 
+			}
+			//新建标注并放进titile
+			var label = new BMap.Label(markerArr[i].title, {
+				offset : new BMap.Size(20, -10)
+			});
+			//新建标注并放进距离
+			var Label = new BMap.Label(markerArr[i].distance, {
+				offset : new BMap.Size(20, -10)
+			});
+			marker[i].setLabel(label,distance);
+			//画点
+			map.addOverlay(marker[i]);
+			//获取每个垃圾桶和当前位置的距离
+			var distance = markerArr[i].distance;
+			marker[i].addEventListener("click", function(markerArr) {
+				//判断垃圾桶状态,如果未满进行导航,如果已满提示垃圾桶已满
+				if(selectWhat === "full"){
+					mui.toast("当前垃圾桶已满!");
+				}else{
+					mui.toast('你已进入导航，垃圾桶距离'+distance);
+	            	vm.trashNavigation=true;
+	            	endlng = markerArr.target.point.lng;
+					endlat = markerArr.target.point.lat
+	              	//获取当前位置的点,并标注为起点
+	  				var start = new BMap.Point(currentLongitude, currentLatitude);
+	  				//获取垃圾桶的点,并标注为终点
+	  				var end=markerArr.target.point;
+	              	//生成步行路线
+	  				var walking = new BMap.WalkingRoute(map, {
+	  					renderOptions : {
+	  						map : map,
+	  						autoViewport : true
+	  					}
+	  				});
+	  				//清空覆盖物
+	              	map.clearOverlays();
+	  				walking.search(start, end);
+				}
+			});
+		}
+	}
+</script>
+</html>

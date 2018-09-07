@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<title>评论列表</title>
+<link rel="stylesheet" href="../css/mui.css" />
+<link rel="stylesheet" href="../css/iconfont.css" />
+<link rel="stylesheet" href="../css/common.css" />
+<style>
+	.mui-table-view .mui-media-object{
+	    min-width: 20px;
+	}
+	.mui-table-view:before{
+		height:0px;
+	}
+	.mui-table-view:after{
+		height:0px;
+	}
+	.mui-media-body{
+		position:relative;
+	}
+	.mui-media-body p{
+		min-height:20px;
+	}
+	.mui-table-view .mui-media-object.mui-pull-left{
+		height:35px;
+		width:35px;
+		border-radius: 100%;
+	}
+	.comment{
+		color:black;
+	}
+	.comment > input{
+		width:85%;
+		border: none;
+	    margin-bottom: 0px;
+	    margin-top: 5px;
+	}
+	.nickName{
+		font-size:17px;
+	}
+	.thumbUp{
+		position:absolute;
+		top:0px;
+		right:0px;
+	}
+	.recentCommentsTip{
+	    margin: 0px;
+	    height: 40px;
+	    line-height: 40px;
+	    background: #ffffff;
+	}
+	.recentCommentsTip > span{
+	    background-color: #0095f7;
+	    color: #ffffff;
+	    padding: 3px 5px;
+	}
+	.commentDisable{
+	    background: #cccccc;
+	    color: #FFFFFF;
+	    padding: 5px 5px;
+	    border-radius: 3PX;
+	}
+	.commentWorkable{
+	    background: #0095f7;
+	    padding: 5px 5px;
+	    border-radius: 3px;
+	}
+</style>
+</head>
+<body>
+
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">评论列表</h1>
+</header>
+<nav class='mui-bar mui-bar-tab'>  
+	<div id="comment" class="comment">
+		<input id="commentContent" name="" type="text" value="" placeholder="写点什么吧" v-model="userInput">
+		<span class="commentWorkable" v-if="switchText" v-on:click="commentOn">发送</span>
+		<span class="commentDisable" v-else>发送</span>
+	</div>
+</nav>
+<div  id="pullrefresh" class="mui-content mui-scroll-wrapper">
+	<div class="mui-scroll">
+		<div id="commentList"> 
+			<p class="recentCommentsTip"><span>最新评论</span></p>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media" v-for='ele in comments'>
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" v-if="!ele.memberPicturePath" src="../img/failPic.jpg">
+						<img class="mui-media-object mui-pull-left" v-else v-bind:src="ftpStaticURL+ele.memberPicturePath+ele.memberPictureName">
+						<div class="mui-media-body">
+							<p class="nickName">{{ele.memberNickName}}</p>
+							<p class="comment">{{ele.content}}</p>
+							<span>{{ele.createDate}}</span>
+							<div class="thumbUp">
+								<!-- <span class="mui-icon iconfont icon-dianzan"></span>
+								<span></span> -->
+							</div>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="../js/mui.js" ></script>
+<script type="text/javascript" src="../js/vue.js" ></script>
+<script type="text/javascript" src="../js/common.js" ></script>
+<script type="text/javascript" src="../js/staticVar.js"></script>
+<script type="text/javascript" src="../js/businessJs/commentList.js"></script>
+<script>
+if(!app.isLoginFlag()){
+	 if(mui.os.plus){
+		 mui.plusReady(function(){
+			mui.openWindow({
+				id:"login",
+				url:'login.html'
+			});
+		 });
+	 }else{
+		 mui.ready(function(){
+		 	mui.openWindow({
+				id:"login",
+				url:'login.html'
+			});
+		 });
+	 }
+}
+	if(mui.os.wechat){
+		//wx环境需要判断是否绑定了手机号
+	 	app.isBindPhone();
+	}
+	//初始化
+	mui.init({
+		pullRefresh: {
+			container: '#pullrefresh',
+			down: {
+				callback: pulldownRefresh
+			},
+			up: {
+				contentrefresh: '正在加载...',
+				callback: pullupRefresh
+			},
+			deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+		}
+	});
+
+ 	
+	
+	//实例化文章更多评论列表
+	var commentListVM = new Vue({
+		el:"#commentList",
+		data:{
+			ftpStaticURL:ftpStaticURL,
+			comments:[]
+		},
+		methods:{
+			addComment:function (data) {
+				data.forEach(function(e,i){
+					this.comments.push(e);
+				},this);
+			},
+			removeComment:function(data){
+				this.comments = [];
+			},
+		}
+	});
+	//添加评论vm
+	var commentVM = new Vue({
+		el:"#comment",
+		data:{
+			userInput:""
+		},
+		computed:{
+			switchText:function(){
+				return this.userInput.trim().length > 0?true:false;
+			}
+		},
+		methods:{
+			//TODO 发表评论 
+			commentOn:function(event){
+// 				console.log(this.userInput);
+				//文章更多评论页面进行评论
+				addArticleComment();
+			}
+		}
+	});
+	//下拉刷新具体业务实现
+	function pulldownRefresh() {
+		setTimeout(function() {
+			_initPageNo = 1;
+			_commentCount = 0;
+			commentListVM.removeComment();
+			findArticleMoreComment(null,null);
+			mui('#pullrefresh').pullRefresh().endPulldownToRefresh(false);//结束下拉刷新
+			mui('#pullrefresh').pullRefresh().refresh(true);
+		}, 1500);
+	}
+	//上拉加载具体业务实现
+	function pullupRefresh() {
+		setTimeout(function() {
+			if(_initPageNo*_intiPageSize>=_commentCount){
+				//当前页，已经判断出没有更多
+				mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+			}else{
+				_initPageNo++;
+				//下一页
+				mui('#pullrefresh').pullRefresh().endPullupToRefresh(_initPageNo*_intiPageSize>=_commentCount); //参数为true代表没有更多数据了。
+				findArticleMoreComment(_initPageNo,_intiPageSize);
+			}
+			
+		}, 1500);
+	}
+
+	//获取文章更多评论列表
+	//mui('#pullrefresh').pullRefresh().refresh(true); 重置上拉上拉加载
+	var articleId = getUrlParam("articleId");
+	var categoryId = getUrlParam("categoryId");
+	var _initPageNo=1;//文章当前页码
+	var _intiPageSize=10;//文章页面大小
+	var _commentCount=0;
+	findArticleMoreComment(null,null);
+	
+	
+</script>
+</body>
+</html>

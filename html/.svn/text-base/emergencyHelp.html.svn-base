@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" class="feedback">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>应急求助</title>
+		<link rel="stylesheet" type="text/css" href="../css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/common.css" />
+		<link rel="stylesheet" type="text/css" href="../css/emergencyHelp.css" /> 
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<button id="submit" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">发送</button>
+			<h1 class="mui-title">应急求助</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-inline">求助内容</div>
+				<a class="mui-pull-right mui-inline" href="#popover">
+					快捷输入
+					<span class="mui-icon mui-icon-arrowdown"></span>
+				</a>
+				<!--快捷输入具体内容，开发者可自己替换常用语-->
+				<div id="popover" class="mui-popover">
+					<div class="mui-popover-arrow"></div>
+					<div class="mui-scroll-wrapper">
+						<div class="mui-scroll">
+							<ul class="mui-table-view">
+								<!--仅流应用环境下显示-->
+								<li class="mui-table-view-cell stream">
+									<a href="#">桌面快捷方式创建失败</a>
+								</li>
+								<li class="mui-table-view-cell"><a href="#">无法注册</a></li>
+								<li class="mui-table-view-cell"><a href="#">登录不了</a></li>
+								<li class="mui-table-view-cell"><a href="#">找回密码失败</a></li>
+								<li class="mui-table-view-cell"><a href="#">需要帮助</a></li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row mui-input-row">
+				<textarea id='question' class="mui-input-clear question" placeholder="请描述你的问题..."></textarea>
+			</div>
+			<p>手机号</p>
+			<div class="mui-input-row">
+				<input id='phone' type="text" class="mui-input-clear " placeholder="(必填,方便我们联系你 )" />
+			</div>
+			<p>邮箱</p>
+			<div class="mui-input-row">
+				<input id='email' type="text" class="mui-input-clear " placeholder="(选填,方便我们联系你 )" />
+			</div>
+			<p>地址</p>
+			<div class="mui-input-row">
+				<input id='address' type="text" class="mui-input-clear " placeholder="(选填,方便我们联系你 )" />
+			</div>
+		</div>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=G4rDnMBvmKlYv2KrBYrNnVw8"></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/common.js"></script>
+		<script src="../js/staticVar.js"></script>
+		<script src=" ../js/businessJs/emergencyHelp.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+		 if(mui.os.wechat){
+				//wx环境需要判断是否绑定了手机号
+			 	app.isBindPhone();
+			}
+			mui.init();
+			mui('.mui-scroll-wrapper').scroll();
+			
+			if(!app.isLoginFlag()){
+				 if(mui.os.plus){
+					 mui.plusReady(function(){
+						mui.openWindow({
+							id:"login",
+							url:'login.html'
+						});
+					 });
+				 }else{
+					 mui.ready(function(){
+					 	mui.openWindow({
+							id:"login",
+							url:'login.html'
+						});
+					 });
+				 }
+			 }
+		</script>
+	</body>
+
+</html>

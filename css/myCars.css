@@ -1,0 +1,289 @@
+ul li {
+    list-style-type: none;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+body{background: #fff;}
+*{padding: 0;}
+.platenumber p{font-size: 1rem;padding: 1rem 1rem;margin: 0 !important;}
+.clearfix:after { content: "."; display: block; font-size: 0; height: 0; clear: both; visibility: hidden; }
+.clearfix { display: inline-table;}
+*html .clearfix { height: 1%; }
+.clearfix { display: block; }
+*+html .clearfix { min-height: 1%; }
+.che_tit{ text-align:center; padding:20px;}
+.ul_pro{ background-color:#CED3D9; text-align:center; padding:4px 2px; font-size:14px;}
+.ul_pro li{ float:left; width:11.11%; padding:2px;box-sizing: border-box;}
+.ul_pro .li_close{  float:right; width:22.22%;}
+.ul_pro .li_close span{ background-color:#ACB3BB;}
+.ul_pro .li_clean{  float:right; width:22.22%;}
+.ul_pro li span{ display:block; background-color:#fff; border-radius:4px; box-shadow: 2px 2px 2px #888888; /* max-width:48px; margin:0 auto; */ line-height:32px; padding-top:2px;  }
+.ul_pro li span:active{ background-color:#4DA9F2; color:#fff;}
+.ul_input{    
+	width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #ededed;
+    border-radius: 5px;
+   }
+.ul_input li{ 
+	float:left; 
+	width: calc(100% / 7);
+	padding:2px;
+	text-align:center;
+	border-right: 1px solid #ededed;
+  }
+.newEnergyCarUl li{
+	width:calc(100% / 8);
+}
+.ul_input li span{ 
+	display:block;
+ 	background-color:#fff; 
+ 	margin:0 auto; 
+	height:40px; 
+ 	line-height:40px;
+	}
+.ul_keybord{ background-color:#CED3D9; text-align:center; padding:4px 2px; font-size:14px;}
+.ul_keybord li{ float:left; width:10%; padding:2px;box-sizing: border-box;}
+.ul_keybord .ikey20{ margin-left:5%;}
+.ul_keybord .li_w{ width:11.11%; }
+.ul_keybord .li_close{  float:right; width:22.22%;}
+.ul_keybord .li_close span{ background-color:#ACB3BB;}
+.ul_keybord .li_clean{  float:right; width:22.22%;}
+.ul_keybord li span{ display:block; background-color:#fff; border-radius:4px; box-shadow: 2px 2px 2px #888888;line-height:32px; padding-top:2px;  }
+.ul_keybord li span:active{ background-color:#4DA9F2; color:#fff;}
+#del{background: #136bfd;color: #fff;}
+#sure{background: #136bfd;color: #fff;}
+.CarsBtn{    
+	width: 100%;
+    height: 3rem;
+    line-height: 3rem;
+    background: #fff;
+    margin-top: 10px;
+    padding: 7px 0px;
+    position: absolute;
+   }
+.CarsBtn button{    
+	width: 95%;
+    background: #136bfd;
+    color: #fff;
+    margin: auto !important;
+    display: block;
+    border: none;
+    font-size: 1rem;
+}
+.information{font-size: .8rem;color: gray;margin-right: .8rem;width: 100%;padding-bottom:2rem;background: #fff;}
+.information span{padding: 1rem;}
+.boxcars{background: #fff;padding-top: 1px;padding-bottom: 1rem;}
+.cars_content{
+    height: 7rem;
+    box-shadow: 0 0 10px gainsboro;
+    margin: auto;
+    margin-top: 2rem;
+    border-radius: 5px;
+    margin: 20px 20px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+}
+.cars_content > p{
+	flex:1;
+	padding-left:10px;
+}
+.cars_content > p:first-child{
+	padding-top:10px;
+}
+.licenceplate{padding: .5rem .5rem;}
+.licenceplate p{color:#007aff;font-size: 1.2rem;}
+.bluepencil{
+	width: 100%;
+	height: 1.5rem;
+	margin: auto;
+	border: none !important;
+	display:flex;
+    align-items: center;
+}
+.bluepencil span:first-child{
+	width:46%;
+}
+.bluepencil label{font-size: .9rem;}
+.editor{color: #4395ff;}
+.Delete{
+    color: gray;
+    margin: 0rem 1rem;
+    text-align: right;
+}
+.mycarsBtn{
+	width: 100%;
+    height: 3rem;
+    line-height: 3rem;
+    background: #fff;
+    margin-top: 10px;
+    padding: 7px 0px;
+    position: absolute;
+}
+.mycarsBtn button{width: 90%;height: 2.5rem;background: #136bfd;color: #fff;margin: auto !important;display: block;border: none;font-size: 1rem;}
+#myCarsBody{
+	height:100%;
+}
+.car_input{
+	padding: 0rem 1rem;
+}
+.platenumber{
+	background:#ffffff;
+}
+.mui-content{
+	height:100%;
+	background:none;
+}
+.NoCars{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 165px;
+    align-items: center;
+}
+.NoCars img{
+	width:100px;
+}
+.NoCars p{
+    background: none;
+  		text-align: center;
+}
+.NoCars p:first-child{
+    font-size: 1.25rem;
+    color: black;
+    margin-top: 20px;
+}
+.NoCars p:last-child{
+    font-size: 1.1rem;
+}
+.mui-icon-plusempty{
+	font-size:1.72rem;
+}
+.carType{
+    display: flex;
+    text-align: center;
+    height: 45px;
+    line-height: 45px;
+       border-bottom: 1px solid #ededed;
+}
+.carType div{
+	flex:1;
+}
+.gasCar{
+	position: relative;
+}
+.gasCar:after{
+    content: "";
+    height: 35px;
+    width: 1px;
+    color: #3399ff;
+    position: absolute;
+    bottom: 0;
+    right: 0px;
+    background-color: #c8c7cc;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+.isChecked{
+	position:relative;
+	color: #3399ff;
+} 
+.isColor{
+	position:relative;
+}
+.isColor:after{
+    position: absolute;
+    right: -3px;
+    content: "";
+    background: url(../img/icons/check.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+}
+.isChecked:before{
+    content: "";
+    height: 2px;
+    width: 80%;
+    position: absolute;
+    bottom: 0;
+    left: calc(20% / 2);
+    background-color: #136bfd;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+.plateColor{
+	padding:1rem;
+	display:flex;
+}           
+.text{
+	background:none;
+	color:#fff;
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+.plateColor > span{
+    text-align: center;
+    margin: 0px 13px;
+    border: 1px solid;
+    height: 2.25rem;
+    line-height: 2.25rem;
+    border-radius: 5px;
+    width:100px;
+}
+.plateNumTip span:first-child,.plateColorTip span:first-child{
+	display: inline-block;
+    width: 4px;
+    height: 4px;
+    color: #136bfd;
+    background: #136bfd;
+    border-radius: 100%;
+}
+.thePlateNumber span:nth-child(2){
+	font-size:0.95rem;
+}
+.thePlateNumber span:last-child{
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color:#ffffff;
+}
+.thePlateNumber i{
+    width: 55px;
+    height: 60px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+.yellow{
+	color:yellow;
+	color:#caca26;
+}
+i.yellow{
+	background: url(../img/yellow.png) no-repeat center; 
+    background-size: 101% 101%; 
+    /* background:yellow; */
+}
+.blue{
+	color:#84adcb;
+}
+i.blue{
+	background: url(../img/blue.png) no-repeat center;
+    background-size: 101% 101%; */
+    /* background:blue; */
+}
+.black{
+	color: #272727; 
+}
+i.black{
+	background: url(../img/black.png) no-repeat center; 
+    background-size: 101% 101%; 
+    /* background:black; */
+}

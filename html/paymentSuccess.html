@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>缴费成功</title>
+    <script src="../js/mui.min.js"></script>
+    <link href="../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../iconfont/iconfont.css" />
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+    <link rel="stylesheet" href="../css/payment.css" />
+    <style>
+    	a{
+			color: #fff;
+		}
+		.mui-bar{
+			background-color: #0d95eb;
+		}
+		.mui-title{
+			color: #fff;
+		}
+		.payment_top{
+			height: 45%;
+		}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav" style="box-shadow:none;">
+	    <a class="mui-icon mui-icon-left-nav mui-pull-left mui-action-back"></a>
+	    <h1 class="mui-title">缴费成功</h1>
+	</header>
+	<div class="mui-content">
+		<div class="payment">
+			<div class="payment_content">
+				<div class="payment_list">
+					<div class="payment_topfa">
+						<div class="payment_topfa_div">
+							<p><i class="iconfont icon-dui"></i></p>
+							<p class="payment_color">缴费成功</p>
+							<p>
+								<span>你已成功支付</span>
+								<span id="chepai">[渝G5243B]</span>
+								<span>停车费用</span>
+							</p>
+							<p class="colo_szd">9.00元</p>
+						</div>
+					</div>
+					<div class="payment_bottom">
+						<div class="payment_1">
+							<i class="iconfont icon-ditu"></i>
+							<span class="payment_bsize">恒大两江总部智慧生态城</span>
+							<span class="payment_right">3元/小时</span>
+						</div>
+						<div class="payment_4">
+							重庆市渝北区龙兴镇两江大道
+						</div>
+						<div class="payment_toptime">
+							<p>停车时间</p>
+							<p>2018/3/05 14:00 - 2018/3/05 17:00</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../js/jquery-2.2.0.min.js" ></script>
+<script>
+	$(document).ready(function(){
+		$(window).resize(function(){ 
+		    $(".payment_content").css({ 
+		        position: "absolute", 
+		        left: ($(window).width() - $(".payment_content").outerWidth())/2, 
+		        top: ($(window).height() - $(".payment_content").outerHeight())/2 
+		    });        
+		}); 
+		$(window).resize();
+	});
+	
+	function getUrlParam (name) {
+	    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	    var r = window.location.search.substr(1).match(reg);
+	    if (r!= null) {
+	       return decodeURI(r[2]);
+	    }else{
+	       return null;
+	    }
+	}
+	var numbar= getUrlParam("chepai");
+	document.getElementById("chepai").innerHTML=numbar;
+	</script>
+
+</html>

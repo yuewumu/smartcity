@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<title>一键上网</title>
+	<link rel="stylesheet" href="../css/mui.css" />
+	<link rel="stylesheet" href="../css/common.css" />
+	<style>
+		body{
+			color: #999999;
+		    margin: 0px;
+		}
+		.buttonArea{
+			height:240px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		}
+		.message{
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    justify-content: center;
+		}
+		.msg_about{
+		    display: flex;
+		    width: 100%;
+		    align-items: center;
+		    justify-content: center;
+	        margin-bottom: 20PX;
+		}
+		.msg_about > span{
+			flex:1;
+		    text-align: center;
+		}
+		.msg_use{
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    width: 100%;
+		}
+		.msg_use > div {
+		    flex: 1;
+    		text-align: center;
+		}
+		.advertisement{
+	        position: fixed;
+		    bottom: 0px;
+		    width: 100%;
+		}
+		.advertisement > div{
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    padding: 0px 1px;
+		}
+		.advertisement img{
+			width:100%;
+		}
+		.msg_one{
+			font-size:17px;
+		    margin-bottom: 10px;
+		}
+		.msg_two{
+			color:#339933;
+		    margin-bottom: 20px;
+		}
+		.surplus,.useed_min{
+			color:#339933;
+		}
+		/* 顶部按钮 */
+		.outerCircle{
+ 			width:120px; 
+ 			height:120px; 
+ 		    display: flex;
+ 		    align-items: center; 
+ 		    justify-content: center; 
+			background-image:url(../img/icons/WIFI_bg.png);
+			background-size:100% 100%;
+		}
+		.outerCircle img{
+			width:75px;
+		}
+	</style>
+</head>
+<body>
+	<div class="buttonArea">
+		<div class="outerCircle">
+			<img src="../img/icons/WIFI.png" data-isConnect="false"></img>
+		</div>
+	</div>
+	<div class="message">
+		<div class="msg_one">您需要打开WiFi后才能使用此功能</div>
+		<div class="msg_two">连接龙兴热点即可开启免费上网</div>
+		<div class="msg_about">
+			<span>上网帮助</span>
+			<span>运营公告</span>
+		</div>
+		<div class="msg_use">
+			<div>
+				<div class="surplus">
+					<span>123</span>
+					<span>分钟</span>
+				</div>
+				<span>本次剩余时长</span>
+			</div>
+			<div>
+				<div class="useed_min">
+					<span>55</span>
+					<span>分钟</span>
+				</div>
+				<span>今日累计使用</span>
+			</div>
+		</div>
+	</div>
+	<div class="advertisement">
+		<div>
+			<img alt="" src="../img/shijiuda_ad.jpg">
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var wifiBtn = document.querySelector(".outerCircle > img");
+	wifiBtn.addEventListener("click",function(e){
+		var self = e.currentTarget;
+		var isConnect = self.getAttribute("data-isConnect"); 
+		if(isConnect === "false"){
+			self.setAttribute("src","../img/icons/WIFI_connected.png");
+			self.setAttribute("data-isConnect",true);
+		}else{
+			self.setAttribute("src","../img/icons/WIFI.png");
+			self.setAttribute("data-isConnect",false);
+		}
+	})
+</script>
+</html>

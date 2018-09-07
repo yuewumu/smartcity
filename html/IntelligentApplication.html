@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>智慧城市应用</title>
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<style>
+			.mui-grid-view.mui-grid-9 .mui-table-view-cell{
+			    padding: 5px;
+			}
+			.mui-grid-view.mui-grid-9 .mui-media .mui-icon{
+				font-size: 3.4em;
+			}
+			.mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body{
+				margin-top: 5px;
+			}
+			.mui-grid-view.mui-grid-9{
+				background: none;
+			}
+			.mui-grid-view.mui-grid-9 .mui-table-view-cell>a:not(.mui-btn){
+				border-radius: 5px;
+			}
+			.mui-media a{
+				background: #fff;
+			}
+			.mui-table-view-cell img{
+				width:58px;
+				height:58px;
+			}
+			header.mui-bar-nav{
+			    background: #007aff;
+			}
+			header.mui-bar-nav > .mui-title{
+				color:#ffffff;
+			}
+			.add-badge{
+			    position: absolute;
+			    background-color: #91b4ff;
+			    top: 16%;
+			    right: 8px;
+			    background: url(../img/icons/addIcon.png);
+			    display: block;
+			    width: 17px;
+			    height: 17px;
+			    background-size: contain;
+			}
+			.delete-badge{
+				position: absolute;
+			    background-color: #91b4ff;
+			    top: 16%;
+			    right: 8px;
+			    background: url(../img/icons/removeIcon.png);
+			    display: block;
+			    width: 17px;
+			    height: 17px;
+			    background-size: contain;
+			}
+			.remove-badge{
+				position: absolute;
+			    background-color: #91b4ff;
+			    top: 16%;
+			    right: 8px;
+			    background: url(../img/icons/removeIcon.png);
+			    display: block;
+			    width: 17px;
+			    height: 17px;
+			    background-size: contain;
+			}
+		</style>
+		<script type="text/javascript" src="../js/mui.js" ></script>
+	</head>
+	<body>
+	<header class="mui-bar mui-bar-nav">
+		<h1 class="mui-title">智慧城市应用</h1>
+	</header>
+	<nav class='mui-bar mui-bar-tab'>  
+		<a class='mui-tab-item' data-role="wifi">  
+			<img src="../img/icons/robot.png">
+		</a>  
+		<a class='mui-tab-item' data-role="home">  
+			<img src="../img/icons/discovery.png">  
+		</a>
+		<a class='mui-tab-item' data-role="IntelligentApplication">  
+			<img src="../img/icons/menu_check.png">
+		</a>  
+		<a class='mui-tab-item mui-active' data-role="userCenter">  
+			<img src="../img/icons/user.png">  
+		</a>  
+	</nav>
+	<div class="mui-content">
+		<ul id="IntelligentContent" class="mui-table-view mui-grid-view mui-grid-9">
+			<li class="mui-table-view-cell mui-media mui-col-xs-6" :data-id="item.id" :data-index="index" @click="clickApplication" v-for="(item, index) in Intelligents">
+				<a :data-href="item.forwardurl"> 
+					<img alt="" :src="item.iconurl">
+					<div class="mui-media-body">{{item.name}}</div>
+					<span v-if="item.isChecked" class="delete-badge"></span>
+					<span v-else-if="item.isChecked === false" class="add-badge"></span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<script type="text/javascript" src="../js/mui.js" ></script>
+	<script type="text/javascript" src="../js/vue.js" ></script>
+	<script type="text/javascript" src="../js/jquery-2.2.0.min.js" ></script>
+	<script type="text/javascript" src="../js/common.js" ></script>
+	<script type="text/javascript" src="../js/staticVar.js" ></script>
+	<script type="text/javascript" src="../js/businessJs/IntelligentApplication.js"></script>
+	<script type="text/javascript">
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+		 if(mui.os.wechat){
+			//wx环境需要判断是否绑定了手机号
+		 	app.isBindPhone();
+		}
+		 
+		 //加载智慧应用列表 
+		 getAllMobileSmartappList();
+		 var vm = new Vue({
+			 el:"#IntelligentContent",
+			 data(){
+				 return {
+					 Intelligents:[],//全部智慧应用
+					 cacheIntelligents:"",
+					 checkedIntelligents:[]//用户设置在首页的智慧应用 
+				 }
+			 },
+			 methods:{
+				 clickApplication:function(e){
+					 var self = e.currentTarget;
+					 var addMode = $(".add-badge",self)[0];
+					 var removeMode = $(".delete-badge",self)[0];
+					 var applictionID = self.getAttribute("data-id");
+					 var index = self.getAttribute("data-index");
+					 var checkedApps =  this.cacheIntelligents.split(",");
+					 //增加一条智慧应用 
+					 if(addMode){
+						 this.Intelligents[index].isChecked = true;
+						 if(this.cacheIntelligents.length === 0){
+							 this.cacheIntelligents = applictionID;
+						 }else{
+							 this.cacheIntelligents += ","+applictionID;
+						 }
+						 savaDisplaySmartappByChosed(_userID,this.cacheIntelligents);
+					 //移除一条智慧应用 	 
+					 }else if(removeMode){
+						 this.Intelligents[index].isChecked = false;
+						 checkedApps.forEach(function(e,i){
+							 if(e === applictionID){
+								 checkedApps.remove(applictionID);
+							 }
+						 });
+						 var checkedAppsStr = checkedApps.toString();
+						 this.cacheIntelligents = checkedAppsStr;
+						 savaDisplaySmartappByChosed(_userID,this.cacheIntelligents);
+					 //不是编辑状态，直接跳转对应页面 
+					 }else{
+						 var href = $("a",self)[0].getAttribute("data-href");
+						 mui.openWindow({
+							    url:href
+						  });
+					 }
+				 }
+			 }
+		 })
+		 var tab = mui(".mui-tab-item");
+		 //底部选项卡点击
+		 tab.each(function(i,e){
+			e.addEventListener("tap",function(e){
+				e.preventDefault();
+				var self = e.currentTarget;
+				if (self && self.getAttribute("data-role") === "home") {
+					mui.openWindow({
+					    id:'home',
+					    url:'../index.html'
+				  });
+				}
+				if (self && self.getAttribute("data-role") === "userCenter") {
+					mui.openWindow({
+					    id:'userCenter',
+					    url:'userCenter.html'
+				  });
+				}
+				if (self && self.getAttribute("data-role") === "wifi") {
+					mui.openWindow({
+					    id:'connectWifi',
+					    url:'connectWifi.html'
+				  });
+				}
+			});
+		 });
+	 </script>
+ </body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>个人信息修改</title>
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<link rel="stylesheet" href="../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../css/iconfont.css" />
+		<style>
+			body{
+				color:#474747;
+			}
+			.mui-media-body span{
+				font-size:15px;
+				color:black;
+			}
+			.mui-popover{
+				top: calc((100% - 121px)/2);
+		 		left: calc((100% - 280px)/2);
+			}
+			.photo{
+				margin-bottom: 20px;
+			}
+			.photo img{
+				width:32px;
+			}
+			.mui-media-body > img{
+				width: 30px;
+			}
+			.tip{
+			    height: 40px;
+				line-height: 40px;
+				padding-left: 15px;
+				font-size: 14px;
+				color:#8f8f94; 
+			}
+			.title-sure{
+				display: none;
+			    height: 100%;
+			    align-items: center;
+			    justify-content: flex-end;
+			}
+			#photoFile{
+				position: absolute;
+    			top: 0px;
+    			height: 100%;
+    			width: 100%;
+			}
+			.careerCategory{
+			    background: green;
+			    text-align:center;
+			    display:inline-block;
+			    width:32px;
+			    paddign:0px 2px;
+			    font-size: 12px;
+			    border-radius: 3px;
+			    color:#ffffff;
+			}
+			.careerList span:last-child{
+				color:green;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">个人信息修改</h1>
+			<div class="title-sure mui-pull-right">
+				<a class="confirm">确认</a>
+			</div>
+		</header>
+		<div id="userInfoContent" class="mui-content">
+			<template v-if="showContent">
+				<ul id="list-photo" class="mui-table-view list photo">
+					<li class="mui-table-view-cell mui-media" v-on:click="">
+						<a href="javascript:;">
+							<div class="mui-media-body">
+								<span class="title">头像</span>
+								<img class="mui-pull-right" id="photoImg" v-bind:src="photo"/>
+								<input id="photoFile" accept="image/*" name="photoFile" type="file" style="opacity: 0;" v-on:click="choicePhoto"/>
+							</div>
+						</a>
+					</li>
+				</ul>
+				<ul id="list" class="mui-table-view list">
+					<li class="mui-table-view-cell mui-media nickname" v-on:click="goEditNickName">
+						<a href="javascript:;">
+							<span class="title">昵称</span>
+							<p id="p_nickname" class="mui-pull-right">{{userInfoList.nickname}}</p>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media birthday" v-on:click="checkBirthday">
+						<a href="javascript:;">
+							<span class="title">生日</span>
+							<p class="mui-pull-right">{{userInfoList.birthday}}</p>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media sex" v-on:click="checkSex">
+						<a href="javascript:;" id="openPopover" >
+							<span class="title">性别</span>
+							<p class="mui-pull-right">{{userInfoList.sex}}</p>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media profession" v-on:click="goChoiceCareer">
+						<a href="javascript:;">
+							<span class="title">职业</span>
+							<p class="mui-pull-right">{{userInfoList.profession}}</p>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media location" v-on:click="checkLocation">
+						<a href="javascript:;">
+							<span class="title">所在地</span>
+							<p class="mui-pull-right">{{userInfoList.location}}</p>
+						</a>
+					</li>
+				</ul>
+			</template>
+			<div class="editNickName" v-if="showEditNickName">
+				<div class="tip">点击当前昵称，进行修改</div>
+				<div>
+					<input type="text" class="changedNickName" v-bind:placeholder="userInfoList.nickname">
+				</div>
+			</div>
+			<div class="careerList" id="careerList" v-if="showChoiceCareer">
+				<ul class="mui-table-view">
+				    <li class="mui-table-view-cell" v-for="ele in careerList" v-on:click="checkCareer">
+				    	<span class="careerCategory">{{ele.category}}</span>
+				    	<span class="careerText" v-bind:data-id="ele.id">{{ele.text}}</span>
+				    	<span class="mui-icon iconfont icon-checked mui-pull-right" v-bind:key="ele.id" v-show="ele.id === userInfoList.userCareer"></span>
+				    </li>
+				</ul>
+			</div>
+			<div id="sexPopover" class="mui-popover">
+				<div class="mui-content-padded">选择您的性别</div>
+				<form class="mui-input-group">
+					<div class="mui-input-row mui-radio mui-left">
+						<label>男</label>
+						<input name="radio1" type="radio" value="1" data-text="男">
+					</div>
+					<div class="mui-input-row mui-radio mui-left">
+						<label>女</label>
+						<input name="radio1" type="radio" value="2" data-text="女">
+					</div>
+				</form>
+			</div>
+			<div id="cityResult3" class="ui-alert"></div>
+		</div>
+		<script type="text/javascript" src="../js/mui.js" ></script>
+		<script type="text/javascript" src="../js/vue.js" ></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/staticVar.js" ></script>
+		<script type="text/javascript" src="../js/mui.picker.min.js" ></script>
+		<script src="../js/city.data-3.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/businessJs/careerData.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/businessJs/editUserInfo.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+		 if(mui.os.wechat){
+				//wx环境需要判断是否绑定了手机号
+			 	app.isBindPhone();
+			}
+		var userInfoContentVM = new Vue({
+			el:"#userInfoContent",
+			data:{
+				showContent:true,
+				showEditNickName:false,
+				showChoiceCareer:false,
+				careerList:careerData,
+				photo:"",
+				userCareer:'',
+				userInfoList:{}
+			},
+			computeds:{
+				userCareer1:function(){
+					return this.userCareer;
+				}
+			},
+			methods:{
+				goEditNickName:function(event){
+					this.showContent = false;
+					this.showEditNickName = true;
+					var title = document.querySelector(".mui-title");
+					var sure = document.querySelector(".title-sure");
+					title.innerHTML = "修改昵称";
+					sure.style.display = "flex";
+					document.querySelector(".title-sure > a").addEventListener("tap",function(e){
+						sure.style.display = "none";
+						userInfoContentVM.userInfoList.nickname = document.querySelector(".changedNickName").value||document.querySelector(".changedNickName").placeholder;
+						changeNickname();
+						title.innerHTML = "个人信息修改";
+						mui.back();
+					},false);
+				},
+				goChoiceCareer:function(event){
+					this.showContent = false;
+					this.showChoiceCareer = true;
+				},
+				checkCareer:function(event){
+					var self = event.currentTarget;
+					var title = document.querySelector(".mui-title");
+					var text = mui(".careerText",self)[0].innerText;
+					var key = mui(".careerText",self)[0].getAttribute("data-id");
+					userInfoContentVM.userInfoList.profession = text;
+					userInfoContentVM.userInfoList.userCareer = key;
+					title.innerHTML = "个人信息修改";
+					mui.back();
+					changeProfession(text);
+				},
+				checkBirthday:function(event){
+					var option = {type:"date","beginYear":1950,"endYear":2017} ;
+					var picker = new mui.DtPicker(option);
+					picker.show(function(rs) {
+						userInfoContentVM.userInfoList.birthday = rs.text;
+						changeBirthday(rs);
+						//释放组件资源
+						picker.dispose();
+					});
+				},
+				checkSex:function(event){
+					mui("#sexPopover").popover('show');
+					var radios = mui("input[name='radio1']");
+					if(userInfoContentVM.userInfoList.sex === "男"){
+						radios[0].checked = true;
+					}else if(userInfoContentVM.userInfoList.sex === "女"){
+						radios[1].checked = true;
+					}
+					radios.each(function(i,e){
+						e.addEventListener("click",function(e){
+							var sex = e.target.getAttribute("data-text");
+							if(userInfoContentVM.userInfoList.sex != sex){
+								changeSex(e);
+							}
+							userInfoContentVM.userInfoList.sex = e.target.getAttribute("data-text");
+							mui("#sexPopover").popover('hide');
+						});
+					});
+				},
+				checkLocation:function(event){
+					var cityPicker3 = new mui.PopPicker({
+						layer: 3
+					});
+					cityPicker3.setData(cityData3);
+					var cityResult3 = document.getElementById('cityResult3');
+					cityPicker3.show(function(items) {
+						userInfoContentVM.userInfoList.location = _getParam(items[0], 'text') + " " + _getParam(items[1], 'text') + " " + _getParam(items[2], 'text');
+						changeLocation(items);
+					});
+				},
+				choicePhoto:function(event){
+					var inputFile = event.currentTarget;
+					inputFile.addEventListener('change', readData);
+				}
+			}
+		});
+		</script>
+	</body>
+</html>

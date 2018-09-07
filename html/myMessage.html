@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>我的消息</title>
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<link rel="stylesheet" href="../css/mui.previewImage.css" />
+		<style>
+			p{
+				color:#4d4d4d;
+			}	
+			.messageType{
+				display: flex;
+				align-items: center;
+			}
+			.messageTypenName{
+			    flex: 1;
+			    color: #a6c1df;
+			    padding-left: 10px;
+			    font-size: 15px;
+			}
+			.pushDate{
+				margin: 0 5px;
+				color: #9e9e9e;
+    			font-size: 14px;
+			}
+			.numbers{
+				position: relative;
+				top: -10px;
+			    width: 14px;
+			    height: 14px;
+			    line-height: 14px;
+			    text-align: center;
+			    font-size: 14px;
+			    color: #fff;
+			    background-color: #dd524d;
+			    border-radius: 100%;
+			}
+			.messageTitle{
+				margin-left: 42px;
+			    font-size: 16px;
+    			color: black
+			}
+			.checkDiv{
+				float: left;
+			    position: relative;
+    			left: -8px;
+    			top: 20px;
+			}
+			.checkDiv1{
+				float: left;
+			    position: relative;
+    			left: -8px;
+				top: 9px;
+			}
+			.mui-checkbox.mui-left input[type=checkbox], .mui-radio.mui-left input[type=radio]{
+				left: 0;
+				top: 0px;
+			}
+			.mui-checkbox.mui-left label, .mui-radio.mui-left label{
+				padding-right: 0px;
+				padding-left: 32px;
+			}
+			.delete{
+				display: flex;
+			    align-items: center;
+			    justify-content: flex-end;
+			    color: #007aff;
+			}
+			.msgTitle{
+				color: black;
+				font-size: 14px;
+			}
+			.msgDate{
+				font-size: 12px;
+				color: gray;
+			}
+			.messageType > .mui-media-object{
+				min-width:20px;
+			}
+			.msg-item{
+				    margin-top: 5px;
+    				background: #ffffff;
+			}
+			.msg-content{
+			    display: flex;
+    			flex-direction: column;
+			}
+			.msg-content-inner{
+		        padding: 4px 12px;
+    			margin-top: 10px;
+			}
+			.msg-date{
+			    text-align: right;
+    			padding-right: 5px;
+   			    color: #cccccc;
+			}
+			.msg-who{
+		        color: #ffffff;
+			    display: inline-block;
+			    letter-spacing: 1px;
+			    padding: 0px 12px;
+			    padding-left: 20px;
+			    height: 30px;
+			    line-height: 30px;
+			    background-size: contain;
+			    background-repeat: no-repeat;
+			    margin-top: 5px;
+			}
+			.msg-item-self .msg-who{
+				background-image:url(../img/youFeedBackImg.png);
+			}
+			.msg-item-service .msg-who{
+				background-image:url(../img/serviceReplyImg.png);
+			}
+			.feedBackImg >img{
+				width: 50px;
+			    height: 50px;
+			    margin: 8px;
+			}
+			.isReply{
+			    position: absolute;
+			    top: 20px;
+			    right: 50px;
+			}
+			/* ----时间轴------ */
+			.timeline {
+				margin: 0px auto;
+				max-width: 40em;
+				overflow:hidden;
+				height: auto;
+				position: relative;
+				padding:0px;
+				list-style-type:none;
+				background: url(../img/dashed.png);
+				background-repeat:repeat-y;
+				background-position:8% 0;
+			}
+			.process{
+		        margin-left: 12%;
+			    color: #4d4d4d;
+			    border: 1px solid #9d9d9d;
+			    text-decoration: none;
+			    margin-top: 20px;
+			    margin-right: 20px;
+			    border-radius: 5px;
+			    width: 80%;
+			    text-align: center;
+			    position:relative;
+			}
+			.timeline .process:after {
+	            display: block;
+			    content: ' ';
+			    height: 4px;
+			    width: 4px;
+			    background: #9d9d9d;
+			    border-radius: 50%;
+			    position: absolute;
+			    left: -4%;
+			    top: 0.5em;
+			    border: 2px solid white;
+			}
+			.question{
+		        margin-left: 10px;
+			    color: #ffffff;
+			    margin-top: 10px;
+			    background: #505050;
+			    display: inline-block;
+		        padding: 5px 11px;
+    			border-radius: 15px;
+			}
+			.status{
+			    margin-left: 10px;
+    			margin-top: 10px;
+   			    color: #0099ff;
+			}
+			.processed{
+				color:#0fa97c;
+			}
+			.inHand{
+				color:#e44850;
+			}
+			.askDate{
+				margin-top:10px;
+			}
+			.noEmergency,.noFeedBack{
+				text-align: center;
+    			margin-top: 50px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="messageBody">
+			<div class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 class="mui-title">{{title}}</h1>
+				<!-- <a class="mui-icon mui-icon-compose mui-pull-right edit" v-show="canEdit" v-on:click="doEdit"></a> -->
+			</div>
+			<!-- <nav v-if="check" class='mui-bar mui-bar-footer delete'>  
+				<span class='delete'>删除<span class="deleteNum">({{checkedNum}})</span></span>  
+			</nav> -->
+			<div id="list" class="mui-content" >
+				<ul id="typeList" class="mui-table-view" v-show="mainMessage">
+				    <li class="mui-table-view-cell" v-for='ele in typeList' v-bind:data-type="ele.type" v-on:click="goChildList">
+				    	<div class="mui-input-row mui-checkbox mui-left checkDiv" v-if="check">
+							<label></label>
+							<input name="checkbox" value="Item 1" type="checkbox" >
+						</div>
+						<div>
+					    	<div class="messageType">
+					    		<img class="mui-media-object" v-bind:src="ele.image">
+					    		<span class="messageTypenName">{{ele.typeName}}</span>
+					    		<span class="pushDate">{{ele.date}}</span>
+					    	</div>
+					    	<p class="mui-ellipsis messageTitle">{{ele.title}}</p>
+				    	</div>
+				    </li>
+				</ul>
+				<div v-show="feedBackSubMessage">
+					<template v-if="hasFeedBackMessageList">
+						<ul id="feedBackMessageList" class="mui-table-view">
+							<li class="mui-table-view-cell" v-for="ele in feedBackMessageList" v-on:click="goFeedBackDetail" v-bind:data-id="ele.id">
+						        <a href="javascript:;">
+						        	<div class="mui-input-row mui-checkbox mui-left checkDiv1" v-if="check">
+										<label></label>
+										<input name="checkbox" value="Item 1" type="checkbox" >
+									</div>
+						            <div class="mui-media-body">
+					                	<p class='mui-ellipsis msgTitle'>{{ele.feedbackContent}}</p>
+					                	<span class="msgDate">{{ele.updateDate}}</span>
+					                	<img class="isReply" v-if="ele.feedbackReplayflag === '0'"src="../img/unReply.png">
+					                	<img class="isReply" v-else src="../img/reply.png">
+						            </div>
+						        </a>
+						    </li>
+		   				</ul>
+	   				</template>
+	   				<template v-else>
+				    	<div class="noFeedBack">您暂无求助信息！</div>
+				    </template>
+   				</div>
+   				<div v-show="emergencyHelpSubMessage">
+	   				<template v-if="hasEmergencyHelpMessage">
+						<ul id="emergencyHelpMessageList" class="mui-table-view">
+							<li class="mui-table-view-cell" v-for="ele in emergencyHelpMessageList" v-on:click="goEmergencyHelpDetail" v-bind:data-id="ele.id">
+						        <a href="javascript:;">
+						        	<div class="mui-input-row mui-checkbox mui-left checkDiv1" v-if="check">
+										<label></label>
+										<input name="checkbox" value="Item 1" type="checkbox" >
+									</div>
+						            <div class="mui-media-body">
+					                	<p class='mui-ellipsis msgTitle'>{{ele.question}}</p>
+					                	<span class="msgDate">{{ele.updateDate}}</span>
+					                	<img class="isReply" v-if="ele.status === 'EMERGENCY_STATUS_OFF'"src="../img/processed.png">
+					                	<img class="isReply" v-else src="../img/processing.png">
+						            </div>
+						        </a>
+						    </li>
+		   				</ul>
+	   				</template>
+	   				<template v-else>
+				    	<div class="noEmergency">您暂无求助信息！</div>
+				    </template> 
+			    </div>
+			</div>
+			<div id="msg-list" v-show="messageItem" v-for="ele in messageItemList"> 
+				<div class="msg-item msg-item-service" msg-type="text" v-if="ele.feedbackReplayflag != 0">
+					<span class="msg-who">客服回复</span>
+					<div class="msg-content">
+						<div class="msg-content-inner">
+							{{ele.feedbackReplyList[0].feedbackContent}}
+						</div>
+						<div class="msg-date">{{ele.feedbackReplyList[0].updateDate}}</div>
+					</div>
+					<div class="mui-item-clear"></div>
+				</div>
+				<div class="msg-item msg-item-self" msg-type="text" msg-content="124次">
+					<span class="msg-who">您的反馈</span>
+					<div class="msg-content">
+						<div class="msg-content-inner">{{ele.feedbackContent}}</div>
+						<div class="feedBackImg">
+							<img alt="" data-preview-src="" data-preview-group="1" v-bind:src="ftpStaticURL+img.filePath+img.fileName" v-for="img in ele.feedBackImageList">
+						</div>
+						<div class="msg-date">{{ele.createDate}}</div>
+					</div>
+					<div class="mui-item-clear"></div>
+				</div>
+			</div>
+			<div id="emergencyHelpDetail" v-if="emergencyHelpDetail">
+				<ul class='timeline'>
+					<li class="event" v-for="ele in emergencyHelpList" v-bind:data-id="ele.id">
+						<div class="process">
+							<span>您的问题：</span>
+							<span>{{ele.question}}</span>
+							<div class="askDate">{{ele.updateDate}}</div>
+						</div>
+						<div class="process" v-for="proc in ele.processList">
+							<p>{{proc.processName}}</p>
+							<span>{{proc.processUpdateDate}}</span>
+						</div>
+					</li>
+				</ul>
+				<p class="status processed" v-if="emergencyHelpList[0].status === 'EMERGENCY_STATUS_OFF'">问题处理完毕</p>
+				<p class="status inHand" v-else>正在处理</p>
+			</div>
+		</div>
+		<script type="text/javascript" src="../js/mui.js" ></script>
+		<script type="text/javascript" src="../js/vue.js" ></script>
+		<script type="text/javascript" src="../js/mui.zoom.js"></script>
+		<script type="text/javascript" src="../js/mui.previewimage.js"></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/staticVar.js" ></script>
+		<script type="text/javascript" src="../js/businessJs/myMessage.js" ></script>
+		<script>
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+		 if(mui.os.wechat){
+				//wx环境需要判断是否绑定了手机号
+			 	app.isBindPhone();
+			}
+			var vm = new Vue({
+				el:"#messageBody",
+				data:{
+					title:'我的消息', 
+					check:false,
+					mainMessage:true,
+					feedBackSubMessage:false,
+					emergencyHelpSubMessage:false,
+					messageItem:false,
+					emergencyHelpDetail:false,
+					canEdit:true,
+					checkedNum:0,
+					ftpStaticURL:ftpStaticURL,
+					feedBackMessageList:[],
+					emergencyHelpMessageList:[],
+					messageItemList:[],
+					emergencyHelpList:[{
+						date:"2017-15-02",
+						content:"刘一，您有一项待处理的事项"
+					},{
+						date:"2017-15-19",
+						content:"系统管理员，您有一项待处理的事项"
+					}],
+					typeList:[{
+						type:"emergencyHelp",
+						typeName:"应急求助",
+						image:"../img/icons/emergencyHelp.png",
+						date:"2017-01-02",
+						title:"一个设计小游戏，卡号上的反馈哈看法哈",
+						numbers:"3"
+					},{
+						type:"fadeBack",
+						typeName:"意见反馈",
+						image:"../img/feedBack.png",
+						date:"2017-12-11",
+						title:"框架；发大家发几顿饭就爱",
+						numbers:"3"
+					}]
+				},
+				computed:{
+					hasEmergencyHelpMessage:function(){
+						return this.emergencyHelpMessageList.length > 0;
+					},
+					hasFeedBackMessageList:function(){
+						return this.feedBackMessageList.length > 0;
+					}
+				},
+				methods:{
+					doEdit:function(event){
+						this.check = this.check?false:true;
+						//取消编辑时，checkedNum置为0,否则，下次编辑时会有上次选择的条目数量。
+						this.checkedNum = 0;
+					},
+					goChildList:function(event){
+						var self = event.currentTarget;
+						if(vm.check){
+							var checkbox = mui("input[name='checkbox']",self);
+							checkbox[0].checked = (checkbox[0].checked === true?false:true);
+							if (checkbox[0].checked === true) {
+								vm.checkedNum+=1;
+							}else{
+								vm.checkedNum-=1;
+							}
+						}else{
+							var menuType=self.getAttribute("data-type");
+							if(menuType=="emergencyHelp"){
+								this.title="应急求助列表";
+								this.mainMessage = false;
+								this.feedBackSubMessage = false;
+								this.emergencyHelpSubMessage = true;
+								getEmergencyInfoList();
+							}else if(menuType=="fadeBack"){
+								this.title="意见反馈列表";
+								this.mainMessage = false;
+								this.feedBackSubMessage = true;
+								getMemberFeedBackList();
+							}
+						}
+					},
+					goFeedBackDetail:function(event){
+						var self = event.currentTarget;
+						var id = self.getAttribute("data-id");
+						if(vm.check){
+							var checkbox = mui("input[name='checkbox']",self);
+							checkbox[0].checked = (checkbox[0].checked === true?false:true);
+							if (checkbox[0].checked === true) {
+								vm.checkedNum+=1;
+							}else{
+								vm.checkedNum-=1;
+							}
+						}else{
+							this.title = "意见反馈详情";
+							this.mainMessage = false;
+							this.feedBackSubMessage = false;
+							this.messageItem = true;
+							this.canEdit = false;
+							getMemberFeedBackDetail(id);
+						}
+					},
+					goEmergencyHelpDetail:function(event){
+						var self = event.currentTarget;
+						var id = self.getAttribute("data-id");
+						if(vm.check){
+							var checkbox = mui("input[name='checkbox']",self);
+							checkbox[0].checked = (checkbox[0].checked === true?false:true);
+							if (checkbox[0].checked === true) {
+								vm.checkedNum+=1;
+							}else{
+								vm.checkedNum-=1;
+							}
+						}else{
+							getEmergencyInfoDetail(id);
+							this.title = "应急求助详情";
+							this.emergencyHelpSubMessage = false;
+							this.emergencyHelpDetail = true;
+							this.canEdit = false;
+						}
+					}
+				}
+			});
+			//重写返回逻辑
+			var _back = mui.back;
+			mui.back = function(){
+				if (vm.mainMessage) {
+					_back();
+				}else if(vm.feedBackSubMessage){
+					showTypelist();
+				}else if(vm.emergencyHelpSubMessage){
+					showTypelist();
+				}else if(vm.messageItem){
+					showSubMessage();
+				}else if(vm.emergencyHelpDetail){
+					showSubMessage();
+				}
+			}
+		</script>
+	</body>
+</html>

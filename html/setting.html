@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>设置</title>
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<style>
+			.mg20{
+				margin-top: 20px;
+			}
+			.mui-btn-primary{
+				padding: 6px 4px;
+			}
+			.mui-input-row label{
+			    width: 25%;
+			}
+			.mui-input-row label~input, .mui-input-row label~select, .mui-input-row label~textarea{
+				width:75%;
+			}
+			#editNewPhone{
+				border:none;
+			}
+			#editphoneVidateCode{
+			    border: none;
+			}
+			#getEditphoneVidateCode{
+			    height: 40px;
+			}
+			.currentPhoneTip{
+			    text-align: center;
+			    line-height: 40px;
+			    font-size: 15px;
+		        margin: 0px;
+			}
+			.currentPhone{
+				text-align: center;
+			    line-height: 40px;
+			    font-size: 15px;
+			    color:#0099ff;
+			}
+			.countDown{
+				display:none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="settingBody">
+			<div class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 class="mui-title">{{title}}</h1>
+			</div>
+			<div class="mui-content">
+				<ul class="mui-table-view" v-show="listShow">
+					<!-- 暂时不做<li class="mui-table-view-cell list" data-role="identitySwitch">
+				        <a class="mui-navigate-right">账号切换</a>
+				    </li> -->
+				     <li class="mui-table-view-cell list" data-role="phoneSwitch">
+				        <a class="mui-navigate-right">登录手机号修改</a>
+				    </li>
+				    <li class="mui-table-view-cell list" data-role="pwdSwitch">
+				        <a class="mui-navigate-right">密码修改</a>
+				    </li>
+				</ul>	
+				<ul class="mui-table-view mg20" v-show="listShow">
+					 <li class="mui-table-view-cell list" data-role="aboutUs">
+				        <a class="mui-navigate-right">关于重庆九钰</a>
+				    </li>
+				    <li class="mui-table-view-cell list" data-role="signOut">
+				        <a class="mui-navigate-right">退出登录</a>
+				    </li>
+				</ul>	
+				<div class="phoneEdit" v-show="phoneShow">
+					<div>
+						<p class="currentPhoneTip">你当前登陆的手机号为</p>
+
+						<p class="currentPhone">{{current}}</p>
+
+					</div>
+					<div class="mui-input-row">
+							<input id='editNewPhone' type="text" class="mui-input-clear mui-input" placeholder="请输入新的手机号">
+					</div>
+					<div class="">
+						<div class="mui-input-row" style="width: 60%;display: inline-block;">
+							<input id='editphoneVidateCode' type="text" class="mui-input-clear mui-input" placeholder="请输入验证码">
+						</div>
+						<button id="getEditphoneVidateCode" type="button" class="mui-btn"style="width: 38%;border: none;" v-on:click="vmGetEditPhoneValidateCode">
+							<span>获取验证码</span> 
+							<span v-bind:class="{countDown:!isClick}" class="mui-badge"></span>
+						</button>
+					</div>
+					<div class="mui-content-padded">
+						<button id="editPhoneButton" class="mui-btn mui-btn-block mui-btn-primary" v-on:click="vmEditPhone">修改</button>
+					</div>
+				</div>
+				<div class="pwdEdit" v-show="pwdShow">
+					<div class="mui-input-row">
+						<label>旧密码</label>
+						<input id="oldPwd" type="password" class="mui-input-password" placeholder="请输入旧密码">
+					</div>
+					<div class="mui-input-row">
+						<label>新密码</label>
+						<input id="newPwd" type="password" class="mui-input-password" placeholder="包含字符和数字的6-18位密码">
+					</div>
+					<div class="mui-content-padded">
+						<button class="mui-btn mui-btn-block mui-btn-primary" id="pwdEditButton" v-on:click="vmEditPwd">修改</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="../js/mui.min.js" ></script>
+		<script type="text/javascript" src="../js/vue.js" ></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/staticVar.js" ></script>
+		<script type="text/javascript" src="../js/businessJs/userSetting.js" ></script>
+		<script type="text/javascript">
+		 if(!app.isLoginFlag()){
+			 if(mui.os.plus){
+				 mui.plusReady(function(){
+					mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }else{
+				 mui.ready(function(){
+				 	mui.openWindow({
+						id:"login",
+						url:'login.html'
+					});
+				 });
+			 }
+		 }
+		 if(mui.os.wechat){
+			//wx环境需要判断是否绑定了手机号
+		 	app.isBindPhone();
+		}
+			var vm = new Vue({
+				el:"#settingBody",
+				data:{
+					title:"设置",
+					listShow:true,
+					phoneShow:false,
+					pwdShow:false, 
+					isClick:false, //是否点击获取验证码 
+					current:app.getLoginState('LOGINSTATE').phone  //获取当前用户的手机号码
+				},
+				methods:{
+					vmGetEditPhoneValidateCode:function(event){
+						var self = event.currentTarget;
+						getEditPhoneValidateCode(self);//获取修改手机号验证码
+					},
+					vmEditPhone:function(event){
+						editPhone();//修改手机号
+					},
+					vmEditPwd:function(event){
+						pwdEdit();//修改密码
+					}
+				}
+			});
+			var _back = mui.back;
+			mui.back = function(){
+				clearEditPwdFrom();
+				clearEditPhoneFrom();
+				if(vm.listShow){
+					_back();
+				}else if (vm.phoneShow) {
+					vm.title = "设置";
+					vm.phoneShow = false;
+					vm.listShow = true;
+				}else if (vm.pwdShow) {
+					vm.title = "设置";
+					vm.pwdShow = false;
+					vm.listShow = true;
+				}else{
+					_back();
+				}
+			}
+			var list = mui(".list");
+			list.each(function(i,e){
+				e.addEventListener("tap",function(e){
+					var self = e.currentTarget;
+					if (self && self.getAttribute("data-role") == "identitySwitch") {
+						//账号切换
+						
+					}
+					if (self && self.getAttribute("data-role") == "phoneSwitch") {
+						vm.title = "手机号修改";
+						vm.listShow = false;
+						vm.phoneShow = true;
+						
+					}
+					if(self && self.getAttribute("data-role") == "pwdSwitch"){
+						vm.title = "密码修改";
+						vm.listShow = false;
+						vm.pwdShow = true;
+						
+					}
+					if (self && self.getAttribute("data-role") == "signOut") {
+						var btnArray = ['取消', '确定'];
+						mui.confirm('是否退出登录？', '退出登录', btnArray, function(e) {
+						if (e.index == 1) {
+							app.signOut(function(data){
+								mui.openWindow({
+									url:'../index.html'
+								})
+							})
+						} else {
+							return ;
+						}
+					})
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

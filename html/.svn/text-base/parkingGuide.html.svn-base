@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<title>停车导航</title>
+	<link rel="stylesheet" href="../iconfont/iconfont.css" />
+	<link rel="stylesheet" href="../css/mui.min.css" />
+	<style type="text/css">
+		body, html, #allmap {width: 100%;height: 100%;margin: 0;font-family: "微软雅黑";}
+		.mui-bar{background-color: #f8f8f8;}
+		.mui-bar a{color: #bebebe;}
+		.cars_search{width: 74%;position: fixed;top: 2px;left: 45px;color: #c7c7c7;}
+		.cars_search input{background-color: #fff;border: 1px solid #ebebeb;}
+		.cars_search span{font-size: .8rem;}
+		.cars_menu{font-size:30px;margin-top:12px;color: #c8c8c8;}
+		/* .lookupMap{position: absolute;width: 100%;height: 100%;top: 0;right: 0;bottom: 0;left: 0;z-index: 2;} */
+		footer{width: 100%;height: 5rem;background: #fdfeff;position: fixed;bottom: 0;left: 0;z-index: 3;display: flex;}
+		.lookupTop_left{flex: 5;}
+		.lookupTop_leftTite i{padding-left: 20px;color: #f19aab;font-size: 1.2rem;}
+		.lookupTop_leftTite2{overflow: hidden;height:20px;line-height:20px;}
+		.lookupTop_leftTitefirst{color: #4c4d4f;font-size: 1rem;}
+		.lookupTop_leftTitelast{color: #939496;font-size: .8rem;padding-left: 20px;}
+		.lookupTop_leftTite{height: 29px;line-height:38px;overflow: hidden;}
+		.lookupTop_right{flex: 2;text-align: center;}
+		#lookup_Map{width: 100%;height: 100%;}
+		.mui-search .mui-placeholder .mui-icon{color:#999;}
+		.lookupTop_rightContent{width: 2.5rem;height: 2.5rem;border-radius: 50%;background: #26a5f2;margin: auto;text-align: center;line-height: 2.5rem;color: #fff;margin-top: .5rem;}
+		.lookupTop_rightContent i{font-size: 2rem;}
+		.lookuolist{width: 95%;min-height: 4rem;background: #fff;border-radius: 5px;margin: auto;margin-top: .5rem;display: flex;}
+		.lookuolist_left{flex: 5;border-radius: 5px;}
+		.lookuolist_left p{width: 90%;margin: auto;}
+		.lookuolist_left i{color: #fd7e99;font-size: 1rem;}
+		.lookuolist_left p:first-of-type{width: 90%;margin: auto;margin-top: 10px;color: #515254;font-size: 1.1rem;}
+		.lookuolist_left p:last-of-type{font-size: .8rem;color: #828385;margin-bottom: 5px;}
+		.lookuolist_right{flex: 2;border-radius: 5px;text-align: center;}
+		.lookuolist_right i{font-size: 30px;}
+		.lookuolist_rightBtn{width: 2.5rem;height: 2.5rem;border-radius: 50%;background: #26a5f2;margin: auto;text-align: center;line-height: 2.5rem;color: #fff;margin-top: 1.2rem;}
+		#lookupBox{width:100%;height:100%;}
+		.tangram-suggestion-main{top:43px !important;width:100% !important;left:0px !important;}
+		/* #placename{width: 80%;border: 1px solid #ebebeb;border-radius: 5px;color: #9c9898;margin-top: 2px;margin-left:4px;} */
+		.lookupTop_rightContent a{color:#fff;font-size:2rem;}
+		#btn{position:fixed;top:60px;left:10px;z-index:999;}
+		#Park_rice{color: #8f8f94;font-size: 1rem;width:100%;}
+		label{display: none !important;}
+		.lookuolistBox{width:100%;height:500px;}
+		#back{position: absolute;bottom:5.2rem;left:15px;z-index:999;border: 1px solid #dcdcdc;color:#26a5f2;font-size: .6rem;padding: 3px 6px;}
+	</style>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=G4rDnMBvmKlYv2KrBYrNnVw8"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
+<!-- <script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script> -->
+<script src="../js/mui.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/businessJs/parkingGuide.js"></script>
+<script src="../js/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="../js/staticVar.js"></script>
+</head>
+<body>
+<div id="lookupBox">
+	<header class="mui-bar mui-bar-nav">
+	 	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<div class="mui-input-row mui-search cars_search mui-pull-left" v-on:click="searchBtn">
+			<input id="placename" type="search" class="mui-input-clear" placeholder="搜索周边停车场">
+		</div>
+		<a class="iconfont icon-caidan mui-pull-right cars_menu" v-show="cars_menu" v-on:click="cars_menuBtn"></a>
+	</header>
+	<a href="" id="ios"></a>
+	<div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+	<div id="allmap"  v-show="lookupMymap"></div>
+			<div class="mui-content" v-show="lookuolist">
+				<div class="lookuolistBox">
+					<div class="lookuolist" v-for="site in sites">
+						<div class="lookuolist_left">
+							<p>
+								<i class="iconfont icon-ditu"></i>
+								<span>{{site.name}}</span>
+							</p>
+							<p>
+								<span>{{site.address}}</span>
+							</p>
+						</div>
+						<div class="lookuolist_right">
+							<div class="lookuolist_rightBtn">
+								<i class="iconfont icon-luxian" :data-lng="site.lng" :data-lat="site.lat" v-on:click="carsNavigation"></i>
+							</div>
+							<p>{{site.distance}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+				<footer v-show="lookupBbottoms">
+					<div class="lookupTop_left">
+						<div class="lookupTop_leftTite">
+							<i class="iconfont icon-ditu"></i>
+							<span class="lookupTop_leftTitefirst" id="Park_Name"></span>
+						</div>
+						<div class="lookupTop_leftTite2">
+							<span class="lookupTop_leftTitelast" id="Parking_Lot"></span>
+						</div>
+					</div>
+					<div class="lookupTop_right">
+						<div class="lookupTop_rightContent" >
+							<a  class="iconfont icon-luxian" v-on:click="CarsNavigation" id="CarsNavigation"></a>
+						</div>
+						<p id="Park_rice"></p>
+					</div>
+				</footer>
+			<input id="back" type="button" value="当前位置" v-show="currentPposition"/>
+			
+		</div>
+<script type="text/javascript" src="../js/vue.js" ></script>
+<script>
+	var vm=new Vue({
+		el:"#lookupBox",
+		data:{
+			title:"",
+			lookupMymap:true,
+			cars_menu:true,//跳转第二个页面按钮
+			lookupBbottoms:false,//footer
+			lookuolist:false,//第二个页面
+			currentPposition:true,//当前位置
+			sites:[]
+		},
+		methods:{
+			cars_menuBtn:function(){
+				this.lookupMymap=false;
+				this.cars_menu=false;
+				this.lookupBbottoms=false;
+				this.lookuolist=true;
+				this.currentPposition=false;
+// 				$("#placename").val("");
+// 				$("#placename").attr("placeholder","ADSADS");
+// 				$("#placename").nextAll(".mui-placeholder").children("span:last-child")[0].innerHTML = "ADSADS";
+			},
+			carsNavigation:function(e){
+				var startLng=currentLongitude;
+				var startLat=currentLatitude;
+				var endLat=e.currentTarget.getAttribute("data-lat");
+				var endLng=e.currentTarget.getAttribute("data-lng");
+				location.href="http://api.map.baidu.com/direction?origin=latlng:"
+					+startLat+","+startLng+"|name:当前位置&destination=latlng:"
+					+endLat+","+endLng+"|您要去的停车场&mode=driving&region=重庆&output=html&src=yourCompanyName|yourAppName";
+			},
+			marker:function(){
+				vm.lookupBbottoms=true;
+				this.currentPposition=true;
+			},
+			MyMap:function(){
+				vm.currentPposition=true;
+			},
+			searchBtn:function(e){
+				this.lookupBbottoms=false;
+				this.currentPposition=false;
+			},
+			CarsNavigation:function(e){
+				var startLng=currentLongitude;
+				var startLat=currentLatitude;
+				var endLat=e.currentTarget.getAttribute("lat");
+				var endLng=e.currentTarget.getAttribute("lng");
+				location.href="http://api.map.baidu.com/direction?origin=latlng:"
+					+startLat+","+startLng+"|name:当前位置&destination=latlng:"
+					+endLat+","+endLng+"|您要去的停车场&mode=driving&region=重庆&output=html&src=yourCompanyName|yourAppName";
+			}
+		}
+		
+	});
+	var _back = mui.back;
+	mui.back = function(){
+		if (vm.lookupMymap) {
+			_back();
+		}else if(vm.lookuolist){
+			showTypelist();
+		}
+	}
+	function showTypelist(){
+		vm.lookupMymap=true;
+		vm.cars_menu=true;
+		vm.lookuolist = false;
+		vm.currentPposition=true;
+		var parkName = document.querySelector("#Park_Name").innerHTML;
+		if(parkName){
+			vm.lookupBbottoms = true;		
+		}
+	}
+</script>
+<script type="text/javascript">
+var lat; //中心点的纬度	
+var lng; //中心点的经度
+var map = new BMap.Map("allmap");    // 创建Map实例
+var point;//创建点的实例
+var currentLongitude = "";  //当前的经度
+var currentLatitude = "";	//当前的纬度
+var moveBeforePoint;
+ //页面加载时启动
+ window.onload = function() {
+	getLocationAddress();//获取当前点并标记为中心
+} 
+    
+ //点击停车场图标时的样式内容和触发事件
+ function infoWindow(lng,lat){
+    	var searchInfoWindow1 = new BMapLib.SearchInfoWindow(map, "信息框1内容", {
+    		title: "信息框1", //标题
+    		panel : "panel", //检索结果面板
+    		enableAutoPan : true, //自动平移
+    		searchTypes :[
+    			BMAPLIB_TAB_FROM_HERE, //从这里出发
+    			BMAPLIB_TAB_SEARCH   //周边检索
+    		]
+    	});
+    	/* searchInfoWindow1.open(lng,lat); */
+    }
+    
+ //点击停车场生成驾驶的路线
+ function makeLine(lng,lat){
+	 var  p1 = new BMap.Point(lng,lat);
+	 var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+	 driving.search(point, p1);
+ }
+	
+ //点击回滚按钮回到当前位置
+  var backBtn = document.getElementById('back');
+  backBtn.onclick = function(){
+  	 map.centerAndZoom(point, 15);
+  };
+      
+  
+  //得到地图中心点，并添加覆盖物
+  function makeCnterPoint(point){
+		var marker = new BMap.Marker(point);
+		map.addOverlay(marker);            //画点
+  }
+ 
+//清除覆盖物
+	function remove_overlay(){
+		map.clearOverlays();         
+	}
+	
+//获取当前设备的经度和纬度
+function getLocationAddress(){
+	var geolocation = new BMap.Geolocation();
+	geolocation.getCurrentPosition(function(r){
+	var result=this.getStatus();
+	if( result== BMAP_STATUS_SUCCESS){
+	//获取经纬度
+	moveBeforePoint=r.point;
+	currentLongitude=r.point.lng;
+	currentLatitude=r.point.lat;
+	setCenterAndZoom(currentLongitude,currentLatitude);
+	
+	}else{
+		var promptStr="";
+		switch(result){
+			case BMAP_STATUS_UNKNOWN_LOCATION: promptStr="定位位置,结果未知";break;
+			case BMAP_STATUS_SERVICE_UNAVAILABLE: promptStr="定位服务不可用";break;
+			case BMAP_STATUS_TIMEOUT: promptStr="定位超时";break;
+			default :promptStr="定位失败";break;
+		}
+		
+ 	}
+},{enableHighAccuracy: true,timeout:5000});
+
+}
+
+	//设置中心点和当前位置的方法
+ function setCenterAndZoom(currentLongitude,currentLatitude){
+	// 百度地图API功能
+			map.enableDoubleClickZoom();//启用双击方法
+			map.enableContinuousZoom();  //启动拖拽
+			map.enableScrollWheelZoom(); //启用鼠标缩放
+			point = new BMap.Point(currentLongitude, currentLatitude);//设置中心点坐标
+			  var marker = new BMap.Marker(point);
+			  map.addOverlay(marker);            //画点
+			  var label = new BMap.Label("你在这里!",{offset:new BMap.Size(20,-10)});
+			  marker.setLabel(label);
+			  map.centerAndZoom(point, 16);  // 初始化地图,设置中心点坐标和地图级别
+			 //添加屏幕移动事件监听
+			  map.addEventListener("moveend",function(){
+				 
+				  var moveCenterPoint=map.getCenter();//本次移动之后的point
+				  //计算出移动后两次中心点的距离
+				 if( map.getDistance(moveCenterPoint,moveBeforePoint).toFixed(2)>500){
+					vm.lookupBbottoms=false;
+					remove_overlay();
+					makeCnterPoint(moveCenterPoint);//设置点的坐标
+					getParkingInfo(currentLongitude,currentLatitude,moveCenterPoint.lng,moveCenterPoint.lat);//取到当前位置经纬度,返回后台取出数据
+					moveBeforePoint=moveCenterPoint;
+			  	}
+				  
+			  });
+			  vm.MyMap();
+			  //初始化页面打点
+			  getParkingInfo(currentLongitude,currentLatitude,map.getCenter().lng,map.getCenter().lat);//取到当前位置经纬度,返回后台取出数据
+ }
+	
+  
+
+	function G(id) {
+		return document.getElementById(id);
+	}
+	var ac = new BMap.Autocomplete(    //建立一个自动完成的文本框对象
+			{"input" : "placename"
+			,"location" : map
+		});	
+	ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+		var str = "";
+			var _value = e.fromitem.value;
+			var value = "";
+			if (e.fromitem.index > -1) {
+				value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+			}    
+			str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+			
+			value = "";
+			if (e.toitem.index > -1) {
+				_value = e.toitem.value;
+				value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+			}    
+			str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+			G("searchResultPanel").innerHTML = str;
+		});
+	var myValue;
+	ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+	var _value = e.item.value;
+		myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+		G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+		setPlace();
+	});
+	//此方法为搜索框定点设置位置,点击IOS导航会自动跳转到百度IOS进行导航
+	function setPlace(){
+		map.clearOverlays();    //清除地图上所有覆盖物
+		function myFun(){
+			var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+			lng=map.getCenter().lng;
+			lat=map.getCenter().lat;
+			document.getElementById("ios").href="baidumap://map/navi?location="+lat+","+lng+"\"";
+			map.centerAndZoom(pp, 18);
+			map.addOverlay(new BMap.Marker(pp));    //添加标注
+			vm.lookupBbottoms=false;
+		}
+		var local = new BMap.LocalSearch(map, { //智能搜索
+		  onSearchComplete: myFun
+		});
+		local.search(myValue);
+	}
+	
+	//点击停车场弹出该停车场与当前位置的导航路线
+	function parkingNavigation(startLat,startLng,endLat,endLng){
+		document.getElementById("navigation").href="http://api.map.baidu.com/direction?origin=latlng:"
+			+startLat+","+startLng
+			+"|name:当前位置&destination=latlng:"
+			+endLat+","+endLng
+			+"|您要去的停车场&mode=driving&region=重庆&output=html&src=yourCompanyName|yourAppName";
+			document.getElementById("navigation").click();
+	}
+	//获得input框失去焦点事件，并显示隐藏	 
+	$(document).ready(function(){
+		  $("input").blur(function(){
+			  if(vm.lookuolist){
+				vm.currentPposition=false;
+		 		vm.lookupBbottoms=false;
+			  }else{
+				vm.currentPposition=true;
+			  	var parkName = document.querySelector("#Park_Name").innerHTML;
+				if(parkName){
+					vm.lookupBbottoms = true;		
+				}
+			  }
+		  });
+		});
+	  
+</script>
+</body>
+</html>

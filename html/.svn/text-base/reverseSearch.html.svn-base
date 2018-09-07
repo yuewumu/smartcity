@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>反向寻车</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+	</head>
+	<style>
+		html{background: #fff;}
+		 input::-webkit-input-placeholder {color: #ededed;font-size: 1rem;}
+		.reverseSearchCar{height: 9rem;width: 100%;margin: auto;background: #fff;}
+		.searchCar_content{width: 95%;height: 100%;margin: auto;border-bottom: 1px solid #e9e9e9;}
+		.searchCarlist{width: 90%;height: 3rem;border: 1px solid #dcdcdc;border-radius: 5px;margin: auto;position: relative;top: 15px;}
+		.searchCarlist_left{width: 2.5rem;height: 2.5rem;text-align: center;line-height: 2.5rem;color: #e9e9e9;padding: .4rem;position: relative;}
+		.searchCarlist_left:after{position: absolute;content: '';width: 2px;height: 2rem;background: #ececec;top: 8px;right: 0;}
+		.searchCarlist_right{width: 85%;height: 3rem;}
+		.searchCarlist_right input{background: #fff;border: none;color: #cccaca;padding: 23px 15px !important;margin-bottom: 0 !important;}
+		.reverseSearchCarBtn{width: 90%;margin: auto;height: 2.5rem;margin-top: 55px;text-align: center;line-height: 2.5rem;}
+		.reverseSearchCarBtn button{background: #28abfb;width: 100%;border: none;color: #fff;}
+		.Result{width: 100%;text-align: center;font-size: 1rem;color: gray;}
+		ul{list-style: none;}
+		.clearfix:after { content: "."; display: block; font-size: 0; height: 0; clear: both; visibility: hidden; }
+		.clearfix { display: inline-table;}
+		*html .clearfix { height: 1%; }
+		.clearfix { display: block; }
+		*+html .clearfix { min-height: 1%; }
+		.che_tit{ text-align:center; padding:20px;}
+		.ul_pro{ background-color:#CED3D9; text-align:center; padding:4px 2px; font-size:14px;}
+		.ul_pro li{ float:left; width:11.11%; padding:2px;box-sizing: border-box;}
+		.ul_pro .li_close{  float:right; width:22.22%;}
+		.ul_pro .li_close span{ background-color:#ACB3BB;}
+		.ul_pro .li_clean{  float:right; width:22.22%;}
+		.ul_pro li span{ display:block; background-color:#fff; border-radius:4px; box-shadow: 2px 2px 2px #888888; /* max-width:48px; margin:0 auto; */ line-height:32px; padding-top:2px;  }
+		.ul_pro li span:active{ background-color:#4DA9F2; color:#fff;}
+		.ul_input{
+			width:100%;
+/* 			margin:0 auto; */
+			padding: 0px; 
+			display:flex;
+		}
+		.ul_input li{ 
+			float:left;
+			padding:2px;
+			text-align:center; 
+			flex: 1;
+		}
+		.ul_input li span{ 
+			display:block; 
+			background-color:#fff; 
+			border-radius:4px; 
+			width:20px; 
+			margin:0 auto; 
+			height:20px; 
+			line-height:20px;
+/* 			border: 1px solid #ededed; */
+		}
+		.ul_keybord{ background-color:#CED3D9; text-align:center; padding:4px 2px; font-size:14px;}
+		.ul_keybord li{ float:left; width:10%; padding:2px;box-sizing: border-box;}
+		.ul_keybord .ikey20{ margin-left:5%;}
+		.ul_keybord .li_w{ width:11.11%; }
+		.ul_keybord .li_close{  float:right; width:22.22%;}
+		.ul_keybord .li_close span{ background-color:#ACB3BB;}
+		.ul_keybord .li_clean{  float:right; width:22.22%;}
+		.ul_keybord li span{ display:block; background-color:#fff; border-radius:4px; box-shadow: 2px 2px 2px #888888; /* max-width:48px; margin:0 auto; */ line-height:32px; padding-top:2px;  }
+		.ul_keybord li span:active{ background-color:#4DA9F2; color:#fff;}
+		#del{background: #136bfd;color: #fff;}
+		#sure{background: #136bfd;color: #fff;}
+		.searchCarlistIpt{width: 100%;margin-top: 20px;padding-right: 1rem;}
+		.searchCarlistIpt span{font-size: .8rem;color: gray;}
+	</style>
+	<body>
+		<script type="text/javascript" src="../js/mui.min.js" ></script>
+		<script type="text/javascript" src="../js/layer.js" ></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/reverseWearchCar.js" ></script>
+		<script type="text/javascript" src="../js/jquery-2.2.0.min.js" ></script>
+		<script type="text/javascript">
+			mui.init()
+		</script>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">反向寻车</h1>
+		</header>
+		<div class="mui-content">
+			<div class="reverseSearchCar">
+				<div class="searchCar_content">
+					<div class="searchCarlist">
+						<div class="searchCarlist_left mui-pull-left">
+							<i class="mui-icon mui-icon-search"></i>
+						</div>
+						<div class="searchCarlist_right mui-pull-right">
+							<!--<input type="text" placeholder="输入车牌号"/>-->
+							<div class="" id="car-click">
+								<ul class="car_input ul_input">
+									<li class="input_pro"><span></span></li>
+									<li class="input_pp input_zim"><span></span></li>
+									<li class="input_pp"><span></span></li>
+									<li class="input_pp"><span></span></li>
+									<li class="input_pp"><span></span></li>
+									<li class="input_pp"><span></span></li>
+									<li class="input_pp"><span></span></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="searchCarlistIpt">
+						<label  for="searchCarlistIpt" class="mui-pull-right"><span><input type="checkbox"  id="searchCarlistIpt" />八位新能源车</span></label>
+					</div>
+					<div class="reverseSearchCarBtn">
+						<button id="SearchCarBtn">寻车</button>
+					</div>
+				</div>
+			</div>
+			<div class="Result">
+				暂无搜索结果
+			</div>
+		</div>
+	</body>
+	<script>
+		var _isNenergy;
+		$(document).ready(function(){
+			$(window).resize(function(){ 
+			    $(".Result").css({ 
+			        position: "absolute", 
+			        left: ($(window).width() - $(".Result").outerWidth())/2, 
+			        top: ($(window).height() - $(".Result").outerHeight())/2 
+			    });
+			}); 
+			$(window).resize();
+		});
+		/*点击input框*/
+		$('#searchCarlistIpt').on("click",function(){
+			if($(this).prop("checked")==true){
+				var input_ppAll = document.querySelectorAll(".ul_input li");
+				if(input_ppAll.length < 8){
+					var input_pp = document.querySelector(".input_pp:last-child");
+					var cloneNode = input_pp.cloneNode(true);
+					cloneNode.childNodes[0].innerHTML = "";
+					var ulInput = document.querySelector(".ul_input");
+					ulInput.appendChild(cloneNode);
+					ulInput.classList.add("newEnergyCarUl");
+					_isNenergy = true;
+				}
+			}else{
+				var input_pp = document.querySelector(".input_pp:last-child");
+				input_pp.remove();
+				_isNenergy = false;
+			}
+		})
+		/*点击寻车按钮*/
+		$("#SearchCarBtn").on("click",function(){
+				layer.closeAll();
+				var carInput = $(".car_input li").length;
+				//新能源车牌
+				if(_isNenergy){
+					var numberd=($(".car_input").attr("data-pai"));
+					if(!numberd){
+						mui.toast("车牌不能为空!");
+					}else if(numberd.length==8){
+						mui.toast("未搜索到车辆!");
+					}else{
+						mui.toast("车牌长度不对!");
+					}
+				//普通车牌
+				}else{
+					var numberd=($(".car_input").attr("data-pai"));
+					if(!numberd){
+						mui.toast("车牌不能为空!");
+					}else if(numberd.length==7){
+						mui.toast("未搜索到车辆!");
+					}else{
+						mui.toast("车牌长度为7!");
+					}
+				}
+			})
+	</script>
+</html>

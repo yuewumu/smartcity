@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<title>个人中心</title>
+		<link rel="stylesheet" href="../css/mui.css" />
+		<link rel="stylesheet" href="../css/common.css" />
+		<style>
+			.userInfo{
+				display: flex;
+			    flex-direction: column;
+			    align-items: center;
+			    padding-bottom:20px;
+			    padding-top:10px;
+			    color:#ffffff;
+			}
+			.userInfo .name{
+				font-size:17px;
+				margin-bottom:6px;
+			}
+			.head{
+			    background: #0099ff;
+			}
+			.photo{
+				display: flex;
+			    align-items: center;
+			    justify-content: center;
+			}
+			.photo img{
+			    width:85px;
+		        border-radius: 100%;
+			}
+			.edit{
+			    padding-top: 10px;
+				margin-right: 15px;
+			}
+			.edit img{
+				width: 25px;
+			}
+			.mui-bar-nav{
+			    display: flex;
+			    align-items: flex-end;
+			    justify-content: flex-end;
+			}
+			.mart20{
+				margin-top: 20px;
+			}
+			.list{
+			    display: flex;
+			    justify-content: flex-start;
+			    align-items: center;
+			}
+			.list img{
+				margin-right: 10px;
+			    width: 26px;
+			    border: 1px solid #999999;
+			    border-radius: 100%;
+			    padding: 3px;
+			}
+			.list a{
+				flex:1;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class='mui-bar mui-bar-tab'>  
+			<a class='mui-tab-item' data-role="wifi">  
+				<img src="../img/icons/robot.png">
+			</a>  
+			<a class='mui-tab-item' data-role="home">  
+				<img src="../img/icons/discovery.png">  
+			</a>
+			<a class='mui-tab-item' data-role="IntelligentApplication">  
+				<img src="../img/icons/menu.png">
+			</a>  
+			<a class='mui-tab-item mui-active' data-role="userCenter">  
+				<img src="../img/icons/user_check.png">  
+			</a>  
+		</nav>
+		<div id="userCenterContent" class="mui-content">
+			<div class="head">
+				<div class="edit" v-on:click="editInfo">
+					<img class="mui-pull-right" src="../img/icons/editInfo.png" />
+					<div style="clear: both;"></div>
+				</div>
+				<div class="photo">
+					<img v-bind:src="photo"/>
+				</div>
+				<div class="userInfo">
+					<div class="name">{{nickname}}</div>
+					<div class="addres">
+						<span>{{location}}</span>
+					</div>
+				</div>
+			</div>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell list"  data-role="car" v-on:click="openPage">
+					<img alt="" src="../img/icons/car.png">
+			        <a class="mui-navigate-right">我的车辆</a>
+			    </li>
+			    <li class="mui-table-view-cell list" data-role="message" v-on:click="openPage">
+			   	    <img alt="" src="../img/icons/message.png">
+			        <a class="mui-navigate-right">我的消息</a>
+			    </li>
+			    <li class="mui-table-view-cell list" data-role="store" v-on:click="openPage">
+			    	<img alt="" src="../img/icons/star.png">
+			        <a class="mui-navigate-right">我的收藏</a>
+			    </li>
+			    <li class="mui-table-view-cell list" data-role="feedBack" v-on:click="openPage">
+			    	<img alt="" src="../img/icons/feedBack.png">
+			        <a class="mui-navigate-right">意见反馈</a>
+			    </li>
+			</ul>	
+			<ul class="mui-table-view mart20">
+			    <li class="mui-table-view-cell list" data-role="setting" v-on:click="openPage">
+			    	<img alt="" src="../img/icons/setting.png">
+			        <a class="mui-navigate-right">设置</a>
+			    </li>
+			</ul>			
+		</div>
+		<script type="text/javascript" src="../js/mui.js" ></script>
+		<script type="text/javascript" src="../js/vue.js" ></script>
+		<script type="text/javascript" src="../js/common.js" ></script>
+		<script type="text/javascript" src="../js/staticVar.js" ></script>
+		<script type="text/javascript" src="../js/businessJs/userCenter.js" ></script>
+		<script type="text/javascript">
+			 if(!app.isLoginFlag()){
+				 if(mui.os.plus){
+					 mui.plusReady(function(){
+						mui.openWindow({
+							id:"login",
+							url:'login.html'
+						});
+					 });
+				 }else{
+					 mui.ready(function(){
+					 	mui.openWindow({
+							id:"login",
+							url:'login.html'
+						});
+					 });
+				 }
+			 }
+			if(mui.os.wechat){
+				//wx环境需要判断是否绑定了手机号
+			 	app.isBindPhone();
+			}
+			 
+// 			vm.memberList.nickname = app.getLoginState('LOGINSTATE').nickname;
+// 			vm.memberList.location = app.getLoginState('LOGINSTATE').location;
+    		var userVM = new Vue({
+				el:"#userCenterContent",
+				data:{
+					nickname:app.getLoginState('LOGINSTATE').nickname,
+					location:app.getLoginState('LOGINSTATE').location,
+					photo:ftpStaticURL+app.getLoginState('LOGINSTATE').filePath+app.getLoginState('LOGINSTATE').fileName,
+				},
+				methods:{
+					editInfo:function(event){
+						mui.openWindow({
+						    id:'editUserInfo',
+						    url:'editUserInfo.html'
+					  	});
+					},
+					openPage:function(event){
+						var self = event.currentTarget;
+						if (self && self.getAttribute("data-role") === "car") {
+							mui.openWindow({
+							    id:'car',
+							    url:'myCars.html'
+						  	});
+						}
+						if (self && self.getAttribute("data-role") === "setting") {
+							mui.openWindow({
+							    id:'setting',
+							    url:'setting.html'
+						  	});
+						}
+						if (self && self.getAttribute("data-role") === "message") {
+							mui.openWindow({
+							    id:'message',
+							    url:'myMessage.html'
+						  	});
+						}
+						if (self && self.getAttribute("data-role") === "store") {
+							mui.openWindow({
+							    id:'favorite',
+							    url:'myFavorite.html'
+						  	});
+						}
+						if (self && self.getAttribute("data-role") === "feedBack") {
+							mui.openWindow({
+							    id:'feedBack',
+							    url:'feedBack.html'
+						  	});
+						}
+					}
+				}
+			});
+			var tab = mui(".mui-tab-item");
+			//底部选项卡点击
+			tab.each(function(i,e){
+				e.addEventListener("tap",function(e){
+					e.preventDefault();
+					var self = e.currentTarget;
+					if (self && self.getAttribute("data-role") === "home") {
+						mui.openWindow({
+						    id:'home',
+						    url:'../index.html'
+					  });
+					}
+					if (self && self.getAttribute("data-role") === "IntelligentApplication") {
+						mui.openWindow({
+						    id:'IntelligentApplication',
+						    url:'IntelligentApplication.html'
+					  });
+					}
+					if (self && self.getAttribute("data-role") === "wifi") {
+						mui.openWindow({
+						    id:'connectWifi',
+						    url:'connectWifi.html'
+					  });
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

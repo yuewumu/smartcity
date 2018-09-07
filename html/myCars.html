@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>车辆页面</title>
+    <link rel="stylesheet" href="../css/mui.min.css" />
+    <link rel="stylesheet" href="../css/layer.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../css/myCars.css" />
+    <script src="../js/mui.min.js"></script>
+    <script type="text/javascript" src="../js/layer.js" ></script>
+    <script type="text/javascript" src="../js/jquery-2.2.0.min.js" ></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <script type="text/javascript" src="../js/choicePlate.js" ></script>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+</head>
+<body>
+	<div id="myCarsBody">
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">{{title}}</h1>
+		    <a class="mui-icon mui-icon-plusempty mui-pull-right" @click="showAddCar" v-show="showNoCars"></a>
+		</header>
+		<div class="mui-content">
+			<transition name="fade">
+				<div class="NoCars" v-show="showNoCars">
+					<img src="../img/car.png">
+					<div>
+						<p>您还未绑定车辆</p>
+						<p>点击右上角添加车辆</p>
+					</div>
+				</div>
+			</transition>
+			<transition name="fade">
+				<div v-show="ShowAddcontent">
+					<div class="platenumber">
+						<div class="carType">
+							<div class="gasCar" :class="{isChecked:isGas}" @click="choiceGas">汽油车</div>
+							<div class="newEnergyCar" :class="{isChecked:isNewEnergy}" @click="choiceNewEnergy">新能源车</div>
+						</div>
+						<p class="plateNumTip">
+							<span></span>
+							<span>输入车牌号</span>
+						</p>
+						<div class="car_input">
+							<ul class="clearfix ul_input">
+								<li class="input_pro"><span></span></li>
+								<li class="input_pp input_zim"><span></span></li>
+								<li class="input_pp"><span></span></li>
+								<li class="input_pp"><span></span></li>
+								<li class="input_pp"><span></span></li>
+								<li class="input_pp"><span></span></li>
+								<li class="input_pp"><span></span></li>
+							</ul>
+						</div>
+						<div>
+							<p class="plateColorTip">
+								<span></span>
+								<span>选择车牌颜色</span>
+							</p>
+							<div class="plateColor">
+								<span class="yellow" :class="{isColor:isYellow}" @click="choiceColor">黄色</span>
+								<span class="blue" :class="{isColor:isBlue}" @click="choiceColor">蓝色</span>
+								<span class="black" :class="{isColor:isBlack}" @click="choiceColor">黑色</span>
+							</div>
+						</div>
+						<div class="CarsBtn">
+							<button @click="carBtnconfirm">确定</button>
+						</div>
+					</div>
+				</div>
+			</transition>
+			<transition name="fade">
+			<div class="myCarsContent" v-show="ShowMyCars">
+				<div class="boxcars">
+					<div class="cars_content"  v-for='(car,index) in myCars' id="CarsContentNumber">
+						<p class="thePlateNumber">
+							<span>车牌号:</span>
+							<span>{{car.plateNumber}}</span>
+							<i :class="car.color" alt="" src=""></i>
+							<span>{{car.color==="yellow"?"黄牌":(car.color==="blue"?"蓝牌":(car.color==="black"?"黑牌":"无"))}}</span>
+						</p>
+						<p class="bluepencil">
+							<span>{{car.type}}</span>
+							<span class="mui-pull-right Delete">
+								<i class="iconfont icon-shanchu1"></i>
+								<label v-bind:data-siteName="car.plateNumber" @click="removeTodo(index)">删除</label>
+							</span>
+							<span class="mui-pull-right editor">
+								<i class="iconfont icon-bianji"></i>
+								<label @click="editPlateNumber(index)">编辑</label>
+							</span>
+						</p>
+					</div>
+				</div>
+				<div class="mycarsBtn">
+					<button @click="addCar" id="addCarBtn">添加车辆</button>
+				</div>
+			</div>	
+			</transition>	
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../js/vue.js" ></script>
+<script type="text/javascript" src="../js/common.js" ></script>
+<script type="text/javascript" src="../js/businessJs/myCars.js" ></script>
+<script type="text/javascript" src="../js/staticVar.js" ></script>
+<script>
+	if(!app.isLoginFlag()){
+		 if(mui.os.plus){
+			 mui.plusReady(function(){
+				mui.openWindow({
+					id:"login",
+					url:'login.html'
+				});
+			 });
+		 }else{
+			 mui.ready(function(){
+			 	mui.openWindow({
+					id:"login",
+					url:'login.html'
+				});
+			 });
+		 }
+	}
+	if(mui.os.wechat){
+		//wx环境需要判断是否绑定了手机号
+	 	app.isBindPhone();
+	}
+	var vm=new Vue({
+		el:"#myCarsBody",
+		data:{
+			title:'我的车辆',  
+			ShowAddcontent:false,//显示添加
+			ShowMyCars:true,//显示我的车辆
+			showNoCars:false,//显示没有车辆 
+			showEditCars:false,//显示修改  
+			isGas:true,//选中汽油车 
+			isNewEnergy:false,//选中新能源车 
+			isYellow:true,//选中黄牌 
+			isBlue:false,//选中蓝牌 
+			isBlack:false,//选中黑牌 
+			myCars:[],
+			flagEditOrAdd:"",
+			editNumber:""
+		},
+		methods:{
+			carBtnconfirm:function(index){
+				//编辑页面的确定按钮 
+				if (vm.flagEditOrAdd=="edit") {
+					var numberd=($(".car_input").attr("data-pai"));
+					numberd = _trim(numberd,"g");
+					if(!numberd){
+						mui.toast("车牌不能为空!");
+					}else if(!numberd && numberd.length<12){
+						mui.toast("车牌长度不小于7位!"); 
+					}else{
+						var id = $(".car_input").attr("data-id");
+						var changedNumber = {};
+						var color = this.isYellow?"yellow":(this.isBlue?"blue":(this.isBlack?"black":""));
+						var type = this.isGas?"汽油车":(this.isNewEnergy?"新能源":""); 
+						var convertColor,convertType;
+						switch(color){
+						case "yellow":
+							convertColor = "plate_number_color_yellow";
+							break;
+						case "black":
+							convertColor = "plate_number_color_black";
+							break;
+						case "blue":
+							convertColor = "plate_number_color_blue";
+							break;
+						default:
+							console.log(color);
+						}
+						switch(type){
+						case "新能源":
+							convertType = "mobile_member_plateNumberType_newenergy";
+							break;
+						case "汽油车":
+							convertType = "mobile_member_plateNumberType_gasoline";
+							break;
+						default:
+						console.log(type);
+						}
+						changedNumber.plateNumber = numberd;
+						changedNumber.color = color;
+						changedNumber.type = type;
+						updateVehicleByMemberVehicleId(id,numberd,convertColor,convertType);
+					}
+				//新增页面的确定按钮 
+				} else{
+					var numberd=($(".car_input").attr("data-pai"));
+					numberd = _trim(numberd,"g");
+					if(!numberd){
+						mui.toast("车牌不能为空!");
+					}else if(!numberd && numberd.length<12){
+						mui.toast("车牌长度为7位!");
+					}else{
+						var firmArr={};
+						var color = this.isYellow?"yellow":(this.isBlue?"blue":(this.isBlack?"black":""));
+						var type = this.isGas?"汽油车":(this.isNewEnergy?"新能源":""); 
+						var convertType = this.isGas?"mobile_member_plateNumberType_gasoline":(this.isNewEnergy?"mobile_member_plateNumberType_newenergy":"");
+						var convertColor = this.isYellow?"plate_number_color_yellow":(this.isBlue?"plate_number_color_blue":(this.isBlack?"plate_number_color_black":""));
+						saveVehicle(numberd,convertColor,convertType,userId);
+						firmArr.plateNumber=numberd;
+						firmArr.color = color;
+						firmArr.type = type;
+					}
+				}
+			},
+			removeTodo: function (index) {
+				var btnArray = ['否', '是'];
+                mui.confirm('确定删除当前车牌吗？', '提示', btnArray, function(e) {
+                    if (e.index == 1) {
+                    	mui.showLoading("正在删除..");
+                    	var id =vm.myCars[index].id;
+       			     	deleteVehicleByMemberVehicleIds(id);
+                    } else {
+                    	
+                    }
+                })
+			},
+			addCar:function(){
+				//点击添加车辆按钮清空车牌号的值
+				$(".car_input li span").html("");
+				var carlenght = this.myCars.length;
+				if (carlenght>=3) {
+					mui.toast("只能添加3辆车!")
+				}else{
+					this.ShowAddcontent=true;
+					this.ShowMyCars=false;
+					this.title="添加车辆";
+					this.flagEditOrAdd = "add";
+				}
+			},
+			editPlateNumber:function(index){
+				var changeNumber = vm.myCars[index].plateNumber;
+				var changeColor = vm.myCars[index].color;
+				var changeType = vm.myCars[index].type;
+				var changeNumberArr = changeNumber.split("");
+				this.ShowAddcontent=true;
+				this.ShowMyCars=false;
+				this.title="修改车辆"; 
+				this.flagEditOrAdd = "edit";
+				if(changeType === "汽油车"){
+					this.choiceGas();
+				}else if(changeType === "新能源"){
+					this.choiceNewEnergy();
+				}
+				this.choiceColor(changeColor);
+				this.editNumber = index;//将被改变的车牌记录在数组中的下标 
+				var currentNumber = document.querySelectorAll(".car_input li span");
+				changeNumberArr.forEach(function(e,i){
+					currentNumber[i].innerHTML = e;
+				});
+				getpai();
+				$(".car_input").attr("data-id",vm.myCars[index].id);
+			},
+			showAddCar:function(){
+				vm.title = "添加车辆";
+				vm.ShowAddcontent = true;
+				vm.showNoCars = false;
+			},
+			choiceGas:function(e){
+				this.isGas = true;
+				this.isNewEnergy = false;
+				//传统能源车牌少一位 
+				var input_ppAll = document.querySelectorAll(".ul_input li");
+				if(input_ppAll.length === 8){
+					var ulInput = document.querySelector(".ul_input");
+					var input_pp = document.querySelector(".input_pp:last-child");
+					ulInput.classList.remove("newEnergyCarUl");
+					ulInput.removeChild(input_pp);
+				}
+				getpai();
+			},
+			choiceNewEnergy:function(e){
+				this.isNewEnergy = true;
+				this.isGas = false;
+				//新能源车牌多一位 
+				var input_ppAll = document.querySelectorAll(".ul_input li");
+				if(input_ppAll.length < 8){
+					var input_pp = document.querySelector(".input_pp:last-child");
+					var cloneNode = input_pp.cloneNode(true);
+					cloneNode.childNodes[0].innerHTML = "";
+					var ulInput = document.querySelector(".ul_input");
+					ulInput.appendChild(cloneNode);
+					ulInput.classList.add("newEnergyCarUl");
+				}
+				getpai();
+			}, 
+			choiceColor:function(e){
+				if(typeof e ===  "string"){
+					var theClass = e
+				}else{
+					var self = e.currentTarget;
+					var theClass = self.getAttribute("class");
+				}
+				switch (theClass){
+				case "yellow":
+					this.isYellow = true;
+					this.isBlue = false;
+					this.isBlack = false;
+				    break;
+				case "blue":
+					this.isYellow = false;
+					this.isBlue = true;
+					this.isBlack = false;
+				    break;
+				case "black":
+					this.isYellow = false;
+					this.isBlue = false;
+					this.isBlack = true;
+				    break;
+				default:
+					console.log(theClass);
+				}
+			}
+		}
+	})
+	//重写返回逻辑
+	var _back = mui.back;
+	mui.back = function(){
+		if (vm.ShowMyCars ||vm.showNoCars) {
+			_back();
+		}else if(vm.ShowAddcontent){
+			if(vm.myCars.length > 0){
+				vm.ShowMyCars = true;
+				vm.ShowAddcontent = false;
+			}else{
+				vm.title = "我的车辆";
+				vm.ShowAddcontent = false;
+				vm.showNoCars = true;
+			}
+		}
+	}
+	getVehicleListByMemberInfoId(userId);
+</script>
+</html>

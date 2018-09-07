@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>缴费车型</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/payment.css" />
+		<link rel="stylesheet" href="../css/layer.css" />
+		<link rel="stylesheet" href="../iconfont/iconfont.css" />
+	</head>
+	<style>
+		.mui-action-back{
+			color: #959595;
+		}
+		.mui-input-row{
+			width: 55px;
+			height: 48px;
+			text-align: center;
+    		line-height: 50px;
+			position: relative;
+		}
+		.mui-input-row:before{
+			width: 1px;
+			height: 40px;
+			content: "";
+			background: #c8c8c8;
+			position: absolute;
+			right: 1px;
+			top: 5px;
+		}
+		#select_k1{
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			text-align: center;
+		}
+		.mui-popover{
+            position: fixed;
+            width: 80%;
+            height: 70%;
+            border-radius: 0;
+            left: 50%;
+            top: 50%;
+            margin: 0 auto;
+            z-index: 9999;
+            background-color: #fff;
+            -webkit-transform: translateX(-50%) translateY(-50%);
+            -moz-transform: translateX(-50%) translateY(-50%);
+            -ms-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+         }
+        .mui-popover-arrow{
+            display: none;
+        }
+        .mui-slider .mui-slider-group .mui-slider-item{
+        	text-align: center;
+        }
+        .mui-slider .mui-slider-group .mui-slider-item img{
+        	width: 60%;
+        }
+        .clearfix:after { content: "."; display: block; font-size: 0; height: 0; clear: both; visibility: hidden; }
+		.clearfix { display: inline-table;}
+		*html .clearfix { height: 1%; }
+		.clearfix { display: block; }
+		*+html .clearfix { min-height: 1%; }
+		.che_tit{ text-align:center; padding:20px;}
+		.ul_pro{ background-color:#CED3D9; text-align:center; padding:4px 2px; font-size:14px;}
+		.ul_pro li{ float:left; width:11.11%; padding:2px;box-sizing: border-box;}
+		.ul_pro .li_close{  float:right; width:22.22%;}
+		.ul_pro .li_close span{ background-color:#ACB3BB;}
+		.ul_pro .li_clean{  float:right; width:22.22%;}
+		.ul_pro li span{ display:block;font-size:1rem; background-color:#fff; border-radius:4px; box-shadow: 2px 2px 2px #888888; /* max-width:48px; margin:0 auto; */ line-height:32px; padding-top:2px;  }
+		.ul_pro li span:active{ background-color:#4DA9F2; color:#fff;}
+		
+		.ul_input{width:100%; margin:0 auto; padding:5px 0;}
+		.ul_input li{ float:left; width:14%; padding:2px;text-align:center; }
+		.ul_input li span{ display:block; background-color:#fff; border:1px solid #ccc; border-radius:4px; width:40px; margin:0 auto; height:40px; line-height:40px; }
+		
+		.ul_keybord{ background-color:#CED3D9; text-align:center; padding:4px 2px; font-size:14px;}
+		.ul_keybord li{ float:left; width:10%; padding:2px;box-sizing: border-box;}
+		.ul_keybord .ikey20{ margin-left:5%;}
+		.ul_keybord .li_w{ width:11.11%; }
+		
+		.ul_keybord .li_close{  float:right; width:22.22%;}
+		.ul_keybord .li_close span{ background-color:#ACB3BB;}
+		.ul_keybord .li_clean{  float:right; width:22.22%;}
+		.ul_keybord li span{font-size:1rem; display:block; background-color:#fff; border-radius:4px; box-shadow: 2px 2px 2px #888888; /* max-width:48px; margin:0 auto; */ line-height:32px; padding-top:2px;  }
+		.ul_keybord li span:active{ background-color:#4DA9F2; color:#fff;}
+		#del{
+			background: #136bfd;
+			color: #fff;
+		}
+		#sure{
+			background: #136bfd;
+			color: #fff;
+		}
+	</style>
+	<body>
+		<div id="jiaofei">
+			<header class="mui-bar mui-bar-nav">
+			    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			    <h1 class="mui-title">缴费车型</h1>
+			</header>
+			<div class="mui-content">
+				<div class="plate_number">
+					<div class="plate_content">
+						<div class="plate_cph">请输入你的车牌号:</div>
+						<div class="car_input">
+							<ul class="clearfix ul_input">
+								<li class="input_pro"><span ></span></li>
+								<li class="input_pp input_zim"><span ></span></li>
+								<li class="input_pp"><span ></span></li>
+								<li class="input_pp"><span ></span></li>
+								<li class="input_pp"><span ></span></li>
+								<li class="input_pp"><span ></span></li>
+								<li class="input_pp"><span ></span></li>
+							</ul>
+						</div>
+						<div class="di_fles">
+							<div class="xuanzhe_car">
+								<span>车辆选择</span>
+							</div>
+							<div class="tupianlunbo">
+								<div id="slider" class="mui-slider" >
+								  <div class="mui-slider-group mui-slider-loop">
+								    <!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+								    <div class="mui-slider-item mui-slider-item-duplicate" data-carId="渝G52344">
+								      <a href="#">
+								        <img src="../img/banner_2.jpg">
+								      </a>
+								    </div>
+								    <!-- 第一张 -->
+								    <div class="mui-slider-item" data-carId="渝G52341">
+								      <a href="#">
+								        <img src="../img/banner_2.jpg">
+								      </a>
+								    </div>
+								    <!-- 第二张 -->
+								    <div class="mui-slider-item" data-carId="渝G52342">
+								      <a href="#">
+								        <img src="../img/banner_2.jpg">
+								      </a>
+								    </div>
+								    <!-- 第三张 -->
+								    <div class="mui-slider-item" data-carId="渝G52343">
+								      <a href="#">
+								        <img src="../img/banner_2.jpg">
+								      </a>
+								    </div>
+								    <!-- 第四张 -->
+								    <div class="mui-slider-item" data-carId="渝G52344">
+								      <a href="#">
+								        <img src="../img/banner_2.jpg">
+								      </a>
+								    </div>
+								    <!-- 额外增加的一个节点(循环轮播：最后一个节点是第一张轮播) -->
+								    <div class="mui-slider-item mui-slider-item-duplicate" data-carId="渝G52341">
+								      <a href="#">
+								        <img src="../img/banner_2.jpg">
+								      </a>
+								    </div>
+								  </div>
+								</div>
+								<div class="dinwei_left">
+									<i class="iconfont icon-zuohua"></i>
+								</div>
+								<div class="dinwei_right">
+									<i class="iconfont icon-youhua"></i>
+								</div>
+							</div>
+							<div class="footer">
+								<button><a class="paymentSure" href="javascript:void(0);">京.A1996</a></button>
+							</div>
+						</div>	
+					</div>
+				</div>
+			</div>
+        </div>
+	</body>
+	<script type="text/javascript" src="../js/layer.js" ></script>
+	<script type="text/javascript" src="../js/vue.js" ></script>
+	<script type="text/javascript" src="../js/mui.js" ></script>
+	<script type="text/javascript" src="../js/jquery-2.2.0.min.js" ></script>
+	<script type="text/javascript" src="../js/choicePlate.js"></script>
+	<script type="text/javascript">
+		mui.init()
+		var currentSliderCarId = document.querySelector(".mui-slider-item:nth-child(2)").getAttribute("data-carId"); //获取当前车牌号
+		var curentSlideNumber = 0;    //当前的图片序号
+		var gallery = mui('.mui-slider'); // 定义为图片轮播  
+		document.querySelector('.mui-slider').addEventListener('slide', function(e) {
+			curentSlideNumber = e.detail.slideNumber;
+			var curentNumber =  e.detail.slideNumber+2;
+			currentSliderCarId = document.querySelector(".mui-slider-item:nth-child("+curentNumber+")").getAttribute("data-carId");
+			document.querySelector('.paymentSure').innerHTML = currentSliderCarId;
+		});
+		document.querySelector('.paymentSure').innerHTML = currentSliderCarId;
+		document.querySelector(".paymentSure").addEventListener("tap",function(e){
+			var carId = encodeURIComponent(e.currentTarget.innerHTML);
+			mui.openWindow({
+				id:"paymentPark",
+				url:'paymentPark.html?chepai='+carId
+			});
+		},false);
+		//点击切换图片
+		document.querySelector('.dinwei_left').addEventListener("tap",function(e){
+			gallery.slider().gotoItem(curentSlideNumber-1);
+		})
+		document.querySelector('.dinwei_right').addEventListener("tap",function(e){
+			gallery.slider().gotoItem(curentSlideNumber+1);
+		})
+	</script>
+</html>
